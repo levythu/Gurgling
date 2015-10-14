@@ -47,6 +47,16 @@ func GetRouter(MountPoint string) Router {
     }
 }
 
+// No mountpoint, used only for router not for connecting go http server
+const not_init_mounter="$NOT_VALID$"
+func ARouter() Router {
+    return &router {
+        mountMap: make(map[string]*router),
+        initMountPoint: not_init_mounter,
+        mat: matcher.NewBFMatcher(),
+    }
+}
+
 // processor must be a IMidware(including Router)/Midware or Terminal, otherwise panic.
 // MountPoint should be valid, otherwise panic.
 func (this *router)Use(mountpoint string, processor Tout) Router {
@@ -126,6 +136,9 @@ func (this *router)UseSpecified(mountpoint string, method string/*=""*/, process
 }
 
 func (this *router)ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    if this.initMountPoint==not_init_mounter {
+        panic(INVALID_MOUNT_POINT)
+    }
     var req=NewRequest(r, this.initMountPoint)
     var res=NewResponse(w)
     this.Handler(req, res)
