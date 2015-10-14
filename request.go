@@ -2,14 +2,19 @@ package gurgling
 
 import (
     "net/http"
+    "strings"
 )
 
 type Request interface {
     //  Path is the url not containing mount point.
     Path() string
+    // pointer to path for modification
+    P2Path() *string
 
     // BaseUrl is the mount point
     BaseUrl() string
+    // pointer to BaseUrl for modification
+    P2BaseUrl() *string
 
     // OriginalUrl is the full URL requested.
     OriginalUrl() string
@@ -70,8 +75,14 @@ type OriRequest struct {
 func (this *OriRequest)Path() string {
     return this.path
 }
+func (this *OriRequest)P2Path() *string {
+    return &this.path
+}
 func (this *OriRequest)BaseUrl() string {
     return this.baseurl
+}
+func (this *OriRequest)P2BaseUrl() *string {
+    return &this.baseurl
 }
 func (this *OriRequest)OriginalUrl() string {
     return this.r.URL.Path
@@ -86,7 +97,7 @@ func (this *OriRequest)Body() Tout {
     return this.r.Body
 }
 func (this *OriRequest)Method() string {
-    return this.r.Method
+    return strings.ToUpper(this.r.Method)
 }
 func (this *OriRequest)Get(key string) string {
     return this.r.Header.Get(key)
