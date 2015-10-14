@@ -52,7 +52,7 @@ const not_init_mounter="$NOT_VALID$"
 func ARouter() Router {
     return &router {
         mountMap: make(map[string]*router),
-        initMountPoint: not_init_mounter,
+        initMountPoint: "/",
         mat: matcher.NewBFMatcher(),
     }
 }

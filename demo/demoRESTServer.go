@@ -3,11 +3,10 @@ package main
 import (
     "fmt"
     . "github.com/levythu/gurgling"
-    "net/http"
 )
 
 func main() {
-    var router=GetRouter("/")
+    var router=ARouter()
     var page=getPageRouter()
 
     router.Get("/", func(req Request, res Response) {
@@ -15,7 +14,6 @@ func main() {
     })
     router.Use("/page", page)
 
-    http.Handle("/", router)
     fmt.Println("Running...")
-    http.ListenAndServe(":8192", nil)
+    LaunchServer(":8192", router)
 }

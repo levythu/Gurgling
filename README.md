@@ -14,16 +14,14 @@ go get github.com/levythu/gurgling
 
 ```go
 package main
-    
+
 import (
     . "github.com/levythu/gurgling"
-    "net/http"
 )
 
 func main() {
-    // Create a gate router.
-    const mountPoint="/"
-    var router=GetRouter(mountPoint)
+    // Create a root router.
+    var router=ARouter()
 
     // Mount one handler
     router.Get("/", func(req Request, res Response) {
@@ -31,11 +29,10 @@ func main() {
     })
 
     // Mount the gate to net/http and run the server
-    http.Handle(mountPoint, router)
     fmt.Println("Running...")
-    http.ListenAndServe(":8080", nil)
+    LaunchServer(":8080", router)
 }
-```	
+```
 
 ### Create sub-routers and mount them
 
@@ -55,9 +52,9 @@ pageRouter.Get("/editor", func(req Request, res Response) {
 
 // Mount the router to the previous one
 router.Use("/page", pageRouter)
-```	
+```
 
-## API Docs 
+## API Docs
 ### Router
 The core module of gurgling. It is indeed an interface, and is implemented by `router`, its default and original version. The interface is designed for extensions.
 
@@ -65,7 +62,7 @@ The core module of gurgling. It is indeed an interface, and is implemented by `r
 Creates and returns one default router for gateway. The mountpoint it is mounted to in `http.Handle()` function should be specified here.
 
 #### `func ARouter() Router`
-Creates and returns one default router. No mountpoint needs to be specified but it can only be mount to another router using `Router.Use()`. Any mount to http gateway will lead to panic.
+Creates and returns one default router with `mountpoint="/"`.
 
 #### `func (*router)Use(mountpoint string, processor Tout) Router`
 Mounts a mountable to the router at mountpoint. Mountpoint must start with `/`, regexp is currently unsupported. It will try to match the mountpoint by prefix.   
@@ -83,7 +80,7 @@ router.Use("/", func(req Request, res Response) (bool, Request, Response) {
 	// PASS the request to the next handler.
 	return true, req, res
 })
-```	
+```
 
 ##### **`IMidware`**  
 An interface which implement Midware function as `.Handler()`.  
@@ -92,7 +89,7 @@ Since Router also implement the function, Router is a special IMidware. It will 
 ```go
 var anotherRouter=ARouter()
 router.Use("/", anotherRouter)
-```	
+```
 
 ##### **`Terminal`** (`type Terminal func(Request, Response)`)
 A function, receiving `Request` and `Response` as parameter.  
@@ -102,7 +99,7 @@ It is a short form of Midware and will never pass request. So it does not have r
 router.Use("/", func(req Request, res Response) {
     res.Send("Hello, World!")
 })
-```	
+```
 
 #### `func (*router)Get(mountpoint string, processor Tout) Router`
 Similar to `Router.Use()` but differs in two points:
