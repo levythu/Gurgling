@@ -2,6 +2,7 @@ package gurgling
 
 import (
     "net/http"
+    _ "fmt"
     "github.com/levythu/gurgling/matcher"
 )
 
@@ -78,6 +79,32 @@ func (this *router)UseSpecified(mountpoint string, method string/*=""*/, process
         panic(INVALID_RULE)
     }
 
+    switch processor:=processor.(type) {
+    case IMidware:
+        // Always use Midware as storage.
+        this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
+            return processor.Handler(req, res)
+        }))
+    case func(Request, Response):
+        // Always use Midware as storage.
+        this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
+            processor(req, res)
+            return false, nil, nil
+        }))
+    case Terminal:
+        // Always use Midware as storage.
+        this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
+            processor(req, res)
+            return false, nil, nil
+        }))
+    case func(Request, Response) (bool, Request, Response):
+        this.mat.AddRule(mountpoint, method, Midware(processor))
+    case Midware:
+        this.mat.AddRule(mountpoint, method, processor)
+    default:
+        panic(INVALID_INVALID_USE)
+    }
+    /*
     if des, ok:=processor.(IMidware); ok {
         // Always use Midware as storage.
         this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
@@ -94,7 +121,7 @@ func (this *router)UseSpecified(mountpoint string, method string/*=""*/, process
     } else {
         panic(INVALID_INVALID_USE)
     }
-
+    */
     return this
 }
 

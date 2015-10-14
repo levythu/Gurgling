@@ -9,9 +9,9 @@ import (
 func main() {
     var router=gurgling.GetRouter("/")
 
-    router.Get("/", gurgling.Terminal(func(req gurgling.Request, res gurgling.Response) {
+    router.Get("/", func(req gurgling.Request, res gurgling.Response) {
         res.Send("hahahaha")
-    }))
+    })
 
     http.Handle("/", router)
     fmt.Println("Running...")
