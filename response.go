@@ -5,6 +5,7 @@ import (
     "sync"
     "io"
     . "github.com/levythu/gurgling/definition"
+    "github.com/levythu/gurgling/encoding"
 )
 
 type Response interface {
@@ -21,6 +22,11 @@ type Response interface {
 
     // Write data to response body. It allows any corresponding operation.
     Write([]byte) (int, error)
+
+    // Send files without any extra headers except contenttype and encrypt.
+    // if contenttype is "", it will be inferred from file extension.
+    // if encoder is nil, no encoder is used
+    SendFile(string, string, encoding.Encoder) error
 
     // While done, any other operation except Write is not allowed anymore.
     Status(string, int) error
@@ -88,4 +94,14 @@ func (this *OriResponse)R() http.ResponseWriter {
 }
 func (this *OriResponse)F() map[string]Tout {
     return this.f
+}
+func (this *OriResponse)SendFile(filepath string, mime string, encoder encoding.Encoder) error {
+    this.lock.Lock()
+    defer this.lock.Unlock()
+
+    if (this.haveSent) {
+        return RES_HEAD_ALREADY_SENT
+    }
+
+    return nil
 }

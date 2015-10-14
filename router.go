@@ -37,7 +37,7 @@ type router struct {
 
 // The error will be fatal.
 func GetRouter(MountPoint string) Router {
-    if !CheckMountpointValidity(&MountPoint) {
+    if !checkMountpointValidity(&MountPoint) {
         panic(INVALID_MOUNT_POINT)
     }
     return &router {

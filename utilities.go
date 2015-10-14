@@ -6,7 +6,7 @@ import (
 
 // Check whether the mountpoint is valid, which must start with "/"
 // If ends with "/", the function will remove it and return TRUE.
-func CheckMountpointValidity(mountpoint *string) bool {
+func checkMountpointValidity(mountpoint *string) bool {
     if !strings.HasPrefix(*mountpoint, "/") {
         return false
     }
