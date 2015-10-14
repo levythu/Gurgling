@@ -59,6 +59,7 @@ func (this *OriResponse)Status(content string, code int) error {
     if (this.haveSent) {
         return RES_HEAD_ALREADY_SENT
     }
+    this.r.Header().Set("Content-Type", "text/plain; charset=utf-8")
     this.r.WriteHeader(code)
     this.haveSent=true
     _, err:=io.WriteString(this.r, content)
