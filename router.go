@@ -13,7 +13,7 @@ type Router interface {
     Post(string, Tout) Router
     Put(string, Tout) Router
     Delete(string, Tout) Router
-    UseSpecified(string, string/*=""*/, Tout) Router
+    UseSpecified(string, string/*=""*/, Tout, bool) Router
     ServeHTTP(http.ResponseWriter, *http.Request)
     Handler(Request, Response) (bool, Request, Response)
 }
@@ -50,31 +50,31 @@ func GetRouter(MountPoint string) Router {
 // processor must be a IMidware(including Router)/Midware or Terminal, otherwise panic.
 // MountPoint should be valid, otherwise panic.
 func (this *router)Use(mountpoint string, processor Tout) Router {
-    return this.UseSpecified(mountpoint, "", processor)
+    return this.UseSpecified(mountpoint, "", processor, false)
 }
 
 // a GET specified version for use
 func (this *router)Get(mountpoint string, processor Tout) Router {
-    return this.UseSpecified(mountpoint, "GET", processor)
+    return this.UseSpecified(mountpoint, "GET", processor, true)
 }
 
 // a POST specified version for use
 func (this *router)Post(mountpoint string, processor Tout) Router {
-    return this.UseSpecified(mountpoint, "GET", processor)
+    return this.UseSpecified(mountpoint, "GET", processor, true)
 }
 
 // a POST specified version for use
 func (this *router)Put(mountpoint string, processor Tout) Router {
-    return this.UseSpecified(mountpoint, "PUT", processor)
+    return this.UseSpecified(mountpoint, "PUT", processor, true)
 }
 
 // a POST specified version for use
 func (this *router)Delete(mountpoint string, processor Tout) Router {
-    return this.UseSpecified(mountpoint, "DELETE", processor)
+    return this.UseSpecified(mountpoint, "DELETE", processor, true)
 }
 
 // The detailed version of use. Default method is WILDCARD.
-func (this *router)UseSpecified(mountpoint string, method string/*=""*/, processor Tout) Router {
+func (this *router)UseSpecified(mountpoint string, method string/*=""*/, processor Tout, isStrict bool) Router {
     if !this.mat.CheckRuleValidity(&mountpoint) {
         panic(INVALID_RULE)
     }
@@ -84,23 +84,23 @@ func (this *router)UseSpecified(mountpoint string, method string/*=""*/, process
         // Always use Midware as storage.
         this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
             return processor.Handler(req, res)
-        }))
+        }), isStrict)
     case func(Request, Response):
         // Always use Midware as storage.
         this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
             processor(req, res)
             return false, nil, nil
-        }))
+        }), isStrict)
     case Terminal:
         // Always use Midware as storage.
         this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
             processor(req, res)
             return false, nil, nil
-        }))
+        }), isStrict)
     case func(Request, Response) (bool, Request, Response):
-        this.mat.AddRule(mountpoint, method, Midware(processor))
+        this.mat.AddRule(mountpoint, method, Midware(processor), isStrict)
     case Midware:
-        this.mat.AddRule(mountpoint, method, processor)
+        this.mat.AddRule(mountpoint, method, processor, isStrict)
     default:
         panic(INVALID_INVALID_USE)
     }

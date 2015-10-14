@@ -11,6 +11,7 @@ type ruleRecord struct {
     rulePattern string
     methodPattern string
     storage Tout
+    isStrict bool
 }
 
 type BruteforceMatcher struct {
@@ -37,7 +38,7 @@ func (this *BruteforceMatcher)CheckRuleValidity(rule *string) bool {
     *rule=(*rule)[:ends]
     return true
 }
-func (this *BruteforceMatcher)AddRule(rulePattern string, methodPattern string, storage Tout) bool {
+func (this *BruteforceMatcher)AddRule(rulePattern string, methodPattern string, storage Tout, isStrict bool) bool {
     if !this.CheckRuleValidity(&rulePattern) {
         return false
     }
@@ -45,6 +46,7 @@ func (this *BruteforceMatcher)AddRule(rulePattern string, methodPattern string, 
         rulePattern: rulePattern,
         methodPattern: methodPattern,
         storage: storage,
+        isStrict: isStrict,
     })
     return true
 }
@@ -58,7 +60,9 @@ func (this *BruteforceMatcher)Match(path *string, baseUrl *string, reqF map[stri
     }
     var length=len(this.rules)
     for startpoint<length {
-        if strings.HasPrefix(*path, this.rules[startpoint].rulePattern) && (this.rules[startpoint].methodPattern=="" ||  this.rules[startpoint].methodPattern==method) {
+        if (  ( this.rules[startpoint].isStrict && (*path==this.rules[startpoint].rulePattern || *path=="/" && this.rules[startpoint].rulePattern=="") ) ||
+            ( !this.rules[startpoint].isStrict && strings.HasPrefix(*path, this.rules[startpoint].rulePattern) )  ) &&
+            (this.rules[startpoint].methodPattern=="" ||  this.rules[startpoint].methodPattern==method) {
             // Matched!
             *path=strings.TrimPrefix(*path, this.rules[startpoint].rulePattern)
             *baseUrl=*baseUrl+this.rules[startpoint].rulePattern

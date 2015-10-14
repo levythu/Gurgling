@@ -13,7 +13,8 @@ type Matcher interface {
 
     // returning value indicates whether successfully
     // The default method is "", which means WILDCARD.
-    AddRule(rulePattern string, methodPattern string/*=""*/, storage Tout) bool
+    // isStrict==true: must strictly match the pattern (whole word), "/" should match "".
+    AddRule(rulePattern string, methodPattern string/*=""*/, storage Tout, isStrict bool) bool
 
     // path and baseUrl is used for modification and matching. prevPoint is
     // used for acceleration and states storing.

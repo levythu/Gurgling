@@ -12,10 +12,10 @@ func assert(t *testing.T, cond bool) {
 
 func TestRules(t *testing.T) {
     var bfmatcher=NewBFMatcher()
-    assert(t, bfmatcher.AddRule("/huahua/post/", "POST", 99)==true)
-    assert(t, bfmatcher.AddRule("/huahua", "", 1)==true)
-    assert(t, bfmatcher.AddRule("qq", "",2)==false)
-    assert(t, bfmatcher.AddRule("/huahua/asd/", "GET", 3)==true)
+    assert(t, bfmatcher.AddRule("/huahua/post/", "POST", 99, false)==true)
+    assert(t, bfmatcher.AddRule("/huahua", "", 1, false)==true)
+    assert(t, bfmatcher.AddRule("qq", "",2, false)==false)
+    assert(t, bfmatcher.AddRule("/huahua/asd/", "GET", 3, false)==true)
 
     var baseurl, path string
     // TODO: add self-assert test
