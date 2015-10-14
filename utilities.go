@@ -11,7 +11,7 @@ func CheckMountpointValidity(mountpoint *string) bool {
         return false
     }
     var ends=len(*mountpoint)
-    for ends>1 && (*mountpoint)[ends-1]=='/' {
+    for ends>0 && (*mountpoint)[ends-1]=='/' {
         ends--
     }
     *mountpoint=(*mountpoint)[:ends]

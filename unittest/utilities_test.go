@@ -23,6 +23,6 @@ func TestCheckMountpointValidity(t *testing.T) {
     perftest("a/", "", false)
     perftest("//a/", "//a", true)
     perftest("/", "/", true)
-    perftest("//////", "/", true)
+    perftest("//////", "", true)
     perftest("/ab/asd/12d///", "/ab/asd/12d", true)
 }

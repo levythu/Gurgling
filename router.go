@@ -2,7 +2,6 @@ package gurgling
 
 import (
     "net/http"
-    _ "fmt"
     "github.com/levythu/gurgling/matcher"
 )
 
@@ -134,6 +133,8 @@ func (this *router)ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (this *router)Handler(req Request, res Response) (bool, Request, Response) {
     var workstatus Tout=nil
     var result Tout
+    var oldPath=req.Path()
+    var oldBase=req.BaseUrl()
     for {
         result, workstatus=this.mat.Match(req.P2Path(), req.P2BaseUrl(), req.Method(), workstatus)
         if result==nil {
@@ -144,8 +145,10 @@ func (this *router)Handler(req Request, res Response) (bool, Request, Response) 
         var isContinue, newReq, newRes=(result.(Midware))(req, res)
         if !isContinue {
             // Match and is indicated not to continue. Exit.
-            return false, newReq, newRes
+            return false, nil, nil
         }
+        *(newReq.P2Path())=oldPath
+        *(newReq.P2BaseUrl())=oldBase
         // Refresh req/res, continue to match the next
         req=newReq
         res=newRes

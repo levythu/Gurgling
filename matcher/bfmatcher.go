@@ -23,11 +23,14 @@ func NewBFMatcher() Matcher {
 }
 
 func (this *BruteforceMatcher)CheckRuleValidity(rule *string) bool {
+    if *rule=="" {
+        return true
+    }
     if !strings.HasPrefix(*rule, "/") {
         return false
     }
     var ends=len(*rule)
-    for ends>1 && (*rule)[ends-1]=='/' {
+    for ends>0 && (*rule)[ends-1]=='/' {
         ends--
     }
     *rule=(*rule)[:ends]
