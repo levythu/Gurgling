@@ -21,6 +21,10 @@ type Router interface {
 // returning manipulated Req, Res and true. otherwise return false and the Res/Req is
 // not specified.
 type Midware func(Request, Response) (bool, Request, Response)
+// a interface version of midware
+type IMidware interface {
+    Handler(Request, Response) (bool, Request, Response)
+}
 // a midware that will always return (false, nil, nil)
 type Terminal func(Request, Response)
 // Implementing http.Handler
@@ -42,7 +46,7 @@ func GetRouter(MountPoint string) Router {
     }
 }
 
-// processor must be a Router/Midware or Terminal, otherwise panic.
+// processor must be a IMidware(including Router)/Midware or Terminal, otherwise panic.
 // MountPoint should be valid, otherwise panic.
 func (this *router)Use(mountpoint string, processor Tout) {
     this.UseSpecified(mountpoint, "", processor)
@@ -73,21 +77,21 @@ func (this *router)UseSpecified(mountpoint string, method string/*=""*/, process
     if !this.mat.CheckRuleValidity(&mountpoint) {
         panic(INVALID_RULE)
     }
-    switch processor.(type) {
-    case Terminal:
+    
+    if des, ok:=processor.(IMidware); ok {
         // Always use Midware as storage.
         this.mat.AddRule(mountpoint, method, func(req Request, res Response) (bool, Request, Response) {
-            (processor.(Terminal))(req, res)
+            return des.Handler(req, res)
+        })
+    } else if des, ok:=processor.(Midware); ok {
+        this.mat.AddRule(mountpoint, method, des)
+    } else if des, ok:=processor.(Terminal); ok {
+        // Always use Midware as storage.
+        this.mat.AddRule(mountpoint, method, func(req Request, res Response) (bool, Request, Response) {
+            des(req, res)
             return false, nil, nil
         })
-    case Midware:
-        this.mat.AddRule(mountpoint, method, processor)
-    case Router:
-        // Always use Midware as storage.
-        this.mat.AddRule(mountpoint, method, func(req Request, res Response) (bool, Request, Response) {
-            return (processor.(Router)).Handler(req, res)
-        })
-    default:
+    } else {
         panic(INVALID_INVALID_USE)
     }
 }
