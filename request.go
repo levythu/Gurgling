@@ -2,8 +2,6 @@ package gurgling
 
 import (
     "net/http"
-    "sync"
-    "io"
 )
 
 type Request interface {
@@ -60,7 +58,7 @@ func NewRequest(res *http.Request, mountpoint string) Request {
     return ret
 }
 
-type OriRequest {
+type OriRequest struct {
     r *http.Request
     f map[string]Tout
 
