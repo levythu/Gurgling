@@ -4,6 +4,7 @@ import (
     "net/http"
     "sync"
     "io"
+    . "github.com/levythu/gurgling/definition"
 )
 
 type Response interface {

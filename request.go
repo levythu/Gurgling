@@ -3,6 +3,7 @@ package gurgling
 import (
     "net/http"
     "strings"
+    . "github.com/levythu/gurgling/definition"
 )
 
 type Request interface {

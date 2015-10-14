@@ -3,6 +3,7 @@ package gurgling
 import (
     "net/http"
     "github.com/levythu/gurgling/matcher"
+    . "github.com/levythu/gurgling/definition"
 )
 
 // Indeed an interface.
@@ -136,7 +137,7 @@ func (this *router)Handler(req Request, res Response) (bool, Request, Response) 
     var oldPath=req.Path()
     var oldBase=req.BaseUrl()
     for {
-        result, workstatus=this.mat.Match(req.p2Path(), req.p2BaseUrl(), req.Method(), workstatus)
+        result, workstatus=this.mat.Match(req.p2Path(), req.p2BaseUrl(), req.F(), req.Method(), workstatus)
         if result==nil {
             // No any more match, return 404
             res.Status("Resource not found. \nby gurgling", 404)

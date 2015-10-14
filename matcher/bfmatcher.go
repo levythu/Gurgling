@@ -4,6 +4,7 @@ package matcher
 
 import (
     "strings"
+    . "github.com/levythu/gurgling/definition"
 )
 
 type ruleRecord struct {
@@ -47,7 +48,7 @@ func (this *BruteforceMatcher)AddRule(rulePattern string, methodPattern string, 
     })
     return true
 }
-func (this *BruteforceMatcher)Match(path *string, baseUrl *string, method string/*=""*/, prevPoint Tout) (Tout, Tout) {
+func (this *BruteforceMatcher)Match(path *string, baseUrl *string, reqF map[string]Tout, method string/*=""*/, prevPoint Tout) (Tout, Tout) {
     var startpoint int
     if prevPoint==nil {
         startpoint=0

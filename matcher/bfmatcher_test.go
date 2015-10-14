@@ -22,30 +22,30 @@ func TestRules(t *testing.T) {
     baseurl=""
     path="/huahua/hahaha"
     t.Log(baseurl, path)
-    t.Log(bfmatcher.Match(&path, &baseurl, "GET", nil))
+    t.Log(bfmatcher.Match(&path, &baseurl, nil, "GET", nil))
     t.Log(baseurl, path)
 
     baseurl="/ex2"
     path="/huahua/post/123/456"
     t.Log(baseurl, path)
-    t.Log(bfmatcher.Match(&path, &baseurl, "HEAD", nil))
+    t.Log(bfmatcher.Match(&path, &baseurl, nil, "HEAD", nil))
     t.Log(baseurl, path)
 
     baseurl="/ex2"
     path="/huahua/post/123/456"
     t.Log(baseurl, path)
-    t.Log(bfmatcher.Match(&path, &baseurl, "POST", nil))
+    t.Log(bfmatcher.Match(&path, &baseurl, nil, "POST", nil))
     t.Log(baseurl, path)
 
     baseurl="/ex2/qq"
     path="/huahua/asd/123/456"
     t.Log(baseurl, path)
-    t.Log(bfmatcher.Match(&path, &baseurl, "GET", nil))
+    t.Log(bfmatcher.Match(&path, &baseurl, nil, "GET", nil))
     t.Log(baseurl, path)
 
     baseurl=""
     path="/qq"
     t.Log(baseurl, path)
-    t.Log(bfmatcher.Match(&path, &baseurl, "GET", nil))
+    t.Log(bfmatcher.Match(&path, &baseurl, nil, "GET", nil))
     t.Log(baseurl, path)
 }

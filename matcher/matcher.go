@@ -2,9 +2,9 @@ package matcher
 
 // The package is a built-in accessory to match regs for router.
 
-type Tout interface{
-    // Nothing
-}
+import (
+    . "github.com/levythu/gurgling/definition"
+)
 
 // Attentez: the AddRule does not guarantee thread-safety, so avoid to exec Match() when adding rules.
 type Matcher interface {
@@ -18,7 +18,8 @@ type Matcher interface {
     // path and baseUrl is used for modification and matching. prevPoint is
     // used for acceleration and states storing.
     // returns the storage and new statepoint, modifying the path and baseUrl as matched.
-    // If match failure, storage should be nil and statepoint is not specified, path and
-    // base URL should remain the unchanged.
-    Match(path *string, baseUrl *string, method string, prevPoint Tout) (/*storage*/Tout, /*statepoint*/Tout)
+    // reqF is req.F(), store data if needed.
+    // If match failure, storage should be nil and statepoint is not specified, path,
+    // base URL and reqF should remain the unchanged.
+    Match(path *string, baseUrl *string, reqF map[string]Tout, method string, prevPoint Tout) (/*storage*/Tout, /*statepoint*/Tout)
 }
