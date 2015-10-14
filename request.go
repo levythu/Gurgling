@@ -9,12 +9,12 @@ type Request interface {
     //  Path is the url not containing mount point.
     Path() string
     // pointer to path for modification
-    P2Path() *string
+    p2Path() *string
 
     // BaseUrl is the mount point
     BaseUrl() string
     // pointer to BaseUrl for modification
-    P2BaseUrl() *string
+    p2BaseUrl() *string
 
     // OriginalUrl is the full URL requested.
     OriginalUrl() string
@@ -75,13 +75,13 @@ type OriRequest struct {
 func (this *OriRequest)Path() string {
     return this.path
 }
-func (this *OriRequest)P2Path() *string {
+func (this *OriRequest)p2Path() *string {
     return &this.path
 }
 func (this *OriRequest)BaseUrl() string {
     return this.baseurl
 }
-func (this *OriRequest)P2BaseUrl() *string {
+func (this *OriRequest)p2BaseUrl() *string {
     return &this.baseurl
 }
 func (this *OriRequest)OriginalUrl() string {

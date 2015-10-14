@@ -136,7 +136,7 @@ func (this *router)Handler(req Request, res Response) (bool, Request, Response) 
     var oldPath=req.Path()
     var oldBase=req.BaseUrl()
     for {
-        result, workstatus=this.mat.Match(req.P2Path(), req.P2BaseUrl(), req.Method(), workstatus)
+        result, workstatus=this.mat.Match(req.p2Path(), req.p2BaseUrl(), req.Method(), workstatus)
         if result==nil {
             // No any more match, return 404
             res.Status("Resource not found. \nby gurgling", 404)
@@ -147,8 +147,8 @@ func (this *router)Handler(req Request, res Response) (bool, Request, Response) 
             // Match and is indicated not to continue. Exit.
             return false, nil, nil
         }
-        *(newReq.P2Path())=oldPath
-        *(newReq.P2BaseUrl())=oldBase
+        *(newReq.p2Path())=oldPath
+        *(newReq.p2BaseUrl())=oldBase
         // Refresh req/res, continue to match the next
         req=newReq
         res=newRes
