@@ -3,12 +3,14 @@ package main
 import (
     "fmt"
     . "github.com/levythu/gurgling"
+    "github.com/levythu/gurgling/utilities/midwares/urlnormalizer"
 )
 
 func main() {
     var router=ARouter()
     var page=getPageRouter()
 
+    router.Use("/", urlnormalizer.ASanitizer())
     router.Get("/", func(req Request, res Response) {
         res.Send("This is index.")
     })

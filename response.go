@@ -41,6 +41,7 @@ type Response interface {
 
     // While done, any other operation except Write is not allowed anymore.
     Redirect(string) error
+    RedirectEX(string, int) error
 
     // get the Original resonse, only use it for advanced purpose
     R() http.ResponseWriter
@@ -126,7 +127,7 @@ func (this *OriResponse)F() map[string]Tout {
     return this.f
 }
 
-func (this *OriResponse)Redirect(newAddr string) error {
+func (this *OriResponse)RedirectEX(newAddr string, code int) error {
     this.lock.Lock()
     defer this.lock.Unlock()
     if (this.haveSent) {
@@ -136,9 +137,12 @@ func (this *OriResponse)Redirect(newAddr string) error {
     this.haveSent=true
 
     this.r.Header().Set(LOCATION_HEADER, newAddr)
-    this.r.WriteHeader(307) // moved temporarily
+    this.r.WriteHeader(code) // moved temporarily
 
     return nil
+}
+func (this *OriResponse)Redirect(newAddr string) error {
+    return this.RedirectEX(newAddr, 307)
 }
 func (this *OriResponse)SendFile(filepath string) error {
     return this.SendFileEx(filepath, "", encoding.GZipEncoder, 200)
