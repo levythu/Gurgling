@@ -8,6 +8,7 @@ import (
 
 type Encoder interface {
     // return the string for Content-Encoding header
+    // "" means not set the header
     ContentEncoding() string
 
     // the corresponding writer wrapper
@@ -20,5 +21,6 @@ type Encoder interface {
 }
 
 var (
-    GZip_Encoder Encoder=&GzipEncoder{}
+    GZipEncoder Encoder=&GzipEncoder{}
+    NOEncoder Encoder=&NoEncoder{}
 )

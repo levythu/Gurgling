@@ -6,6 +6,9 @@ import (
     "io"
     . "github.com/levythu/gurgling/definition"
     "github.com/levythu/gurgling/encoding"
+    fp "path/filepath"
+    MIME "mime"
+    "os"
 )
 
 type Response interface {
@@ -26,7 +29,9 @@ type Response interface {
     // Send files without any extra headers except contenttype and encrypt.
     // if contenttype is "", it will be inferred from file extension.
     // if encoder is nil, no encoder is used
-    SendFile(string, string, encoding.Encoder) error
+    SendFileEx(string, string, encoding.Encoder, int) error
+    // Shorthand for SendFileEx, infer mime, using gzip and return 200.
+    SendFile(string) error
 
     // While done, any other operation except Write is not allowed anymore.
     Status(string, int) error
@@ -95,12 +100,58 @@ func (this *OriResponse)R() http.ResponseWriter {
 func (this *OriResponse)F() map[string]Tout {
     return this.f
 }
-func (this *OriResponse)SendFile(filepath string, mime string, encoder encoding.Encoder) error {
+func (this *OriResponse)SendFile(filepath string) error {
+    return this.SendFileEx(filepath, "", encoding.GZipEncoder, 200)
+}
+func (this *OriResponse)SendFileEx(filepath string, mime string, encoder encoding.Encoder, httpCode int) error {
     this.lock.Lock()
     defer this.lock.Unlock()
-
     if (this.haveSent) {
         return RES_HEAD_ALREADY_SENT
+    }
+
+    // prepare file
+    var fileHandler, fileErr=os.Open(filepath)
+    if fileErr!=nil {
+        return SENDFILE_FILEPATH_ERROR
+    }
+
+    // init mime
+    if mime=="" {
+        // infer the content type
+        mime=MIME.TypeByExtension(fp.Ext(filepath))
+        if mime=="" {
+            mime=DEFAULT_CONTENT_TYPE
+        }
+    }
+    // init encoder
+    if encoder==nil {
+        encoder=encoding.NOEncoder
+    }
+    var desWriter=encoder.WriterWrapper(this.r)
+    if desWriter==nil {
+        // fail to create. return a safe encoder or error? Now returns error.
+        return SENDFILE_ENCODER_NOT_READY
+    }
+
+    this.haveSent=true
+
+    // set headers
+    this.r.Header().Set(CONTENT_TYPE_KEY, mime)
+    if encoder.ContentEncoding()!="" {
+        this.r.Header().Set(CONTENT_ENCODING, encoder.ContentEncoding())
+    }
+    this.r.Header().Set(TRANSFER_ENCODING, CHUNCKED_TRANSFER_ENCODING)
+
+    this.r.WriteHeader(httpCode)
+
+    // trnsfer file
+    _, copyError:=io.Copy(desWriter, fileHandler)
+    desWriter.Close()
+    fileHandler.Close()
+    // No need to close request writer. There's no such an interface.
+    if copyError!=nil {
+        return SENDFILE_SENT_BUT_ABORT
     }
 
     return nil

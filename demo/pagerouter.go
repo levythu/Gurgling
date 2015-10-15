@@ -12,6 +12,13 @@ func getPageRouter() Router {
     page.Get("/edit", func(req Request, res Response) {
         res.Send("Edit page.")
     })
+    page.Use("/file", func(req Request, res Response) {
+        if req.Path()=="" {
+            res.Send("Specify the path please.")
+            return
+        }
+        res.SendFile(req.Path()[1:])
+    })
 
     return page
 }

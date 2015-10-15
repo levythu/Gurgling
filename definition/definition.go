@@ -1,4 +1,4 @@
-package gurgling
+package definition
 
 type Tout interface {
     // Nothing
