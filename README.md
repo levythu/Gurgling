@@ -121,3 +121,5 @@ General version of `Router.Use()`/`Router.Get()`/`Router.Put()`/`Router.Delete()
 
 - `method` specifies the trigger method. Empty string means WILDCARD.  
 - `isStrict` indicates whether the match is performed strictly.
+
+### Response
