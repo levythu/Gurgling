@@ -141,7 +141,6 @@ func (this *OriResponse)SendFileEx(filepath string, mime string, encoder encodin
     if encoder.ContentEncoding()!="" {
         this.r.Header().Set(CONTENT_ENCODING, encoder.ContentEncoding())
     }
-    this.r.Header().Set(TRANSFER_ENCODING, CHUNCKED_TRANSFER_ENCODING)
 
     this.r.WriteHeader(httpCode)
 
