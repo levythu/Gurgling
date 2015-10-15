@@ -125,18 +125,18 @@ General version of `Router.Use()`/`Router.Get()`/`Router.Put()`/`Router.Delete()
 ### Response
 The interface provided in Handler callback wrapping functions for quick response, in Express format. Since it is an interface, further hack by midwares is possible.
 
-#### `(Response)Status(content string, code int) error`
+#### `func (Response)Status(content string, code int) error`
 Quick send a message and specify the return code. Note that if any head-sending operation like `Response.Status`, `Response.Send`, `Response.SendFile`, `Response.SendFileEx`, `Rsponse.SendCode`, `Response.Write` has been invoked before, this one will fail and returns `RES_HEAD_ALREADY_SENT`.
 
 It will set `Content-Type: text/plain; charset=utf-8`.
 
-#### `(Response)Send(content string) error`
+#### `func (Response)Send(content string) error`
 Quick invocation for `Response.Status`, using code 200. Can only be invoked successfully without any preceding head-sending invoking.
 
-#### `(Response)SendCode(code int) error`
+#### `func (Response)SendCode(code int) error`
 Sending the code without any body content. Can only be invoked successfully without any preceding head-sending invoking.
 
-#### `(Response)SendFileEx(filepath string, mime string, encoder encoding.Encoder, code int) error`
+#### `func (Response)SendFileEx(filepath string, mime string, encoder encoding.Encoder, code int) error`
 Sending a local file with content encoding specified by `encoder`, http status code `code` and MIME type `mime`.
 
 - `filepath`: the relative file path for the file to be sent.
@@ -150,20 +150,103 @@ Can only be invoked successfully without any preceding head-sending invoking. Th
 - `SENDFILE_FILEPATH_ERROR`: fail to open target file.
 - `SENDFILE_SENT_BUT_ABORT`: start to send but then abort. **Note that in such case the header was sent, so many operation which require no preceding head-sending invoking will fail.**
 
-#### `(Response)SendFile(filepath string) error`
+#### `func (Response)SendFile(filepath string) error`
 Quick invocation for `Response.SendFileEx`, using code 200 and gzip compressor. MIME will be inferred. Can only be invoked successfully without any preceding head-sending invoking.
 
-#### `(Response)Set(key string, val string) error`
-Set the header. Can only be invoked successfully without any preceding head-sending invoking.
+Example:
 
-#### `(Response)Get(key string) string`
-Look up the header. If the key does not exist, an empty string will be returned.
+```go
+var page=ARouter()
+page.Use("/file", func(req Request, res Response) {
+    if req.Path()=="" {
+        res.Send("Specify the path please.")
+        return
+    }
+    // Eliminating the prefix "/"
+    res.SendFile(req.Path()[1:])
+})
+```
 
-#### `(Response)Write(data []byte) (int, error)`
+#### `func (Response)Set(key string, val string) error`
+Sets the header. Can only be invoked successfully without any preceding head-sending invoking.
+
+#### `func (Response)Get(key string) string`
+Looks up the header. If the key does not exist, an empty string will be returned.
+
+#### `func (Response)Write(data []byte) (int, error)`
 The original interface of `ResponseWriter`. Can be invoked any time but when the header has not been sent, it will sent the header with code=200 automatically.
 
-#### `(Response)R() http.ResponseWriter`
-Return the wrapped original `ResponseWriter` for advanced use.
+#### `func (Response)R() http.ResponseWriter`
+Returns the wrapped original `ResponseWriter` for advanced use.
 
-#### `(Response)F() map[string]Tout`
+#### `func (Response)F() map[string]Tout`
+`Tout` is `interface{}`. It is preserved for any use by midwares, e.g., storing extracted data or adding functions.
+
+### Request
+The interface provided in Handler callback wrapping functions for convenient access to request information. Note that most of the data are read-only.
+
+#### `func (Request)Path() string`
+Returns the current path the Mountable is working on. It usually starts with "/". Note that the mountpoint is excluded and can be found in baseUrl.
+
+Example:
+```go
+var router=ARouter()
+var subrouter=ARouter()
+
+router.Use("/", func(req Request, res Response) (bool, Request, Response) {
+    fmt.Println("<"+req.BaseUrl()+">", ",", "<"+req.Path()+">")
+    // pass the request.
+    return true, req, res
+})
+router.Use("/sub", subrouter)
+subrouter.Use("/", func(req Request, res Response) (bool, Request, Response) {
+    fmt.Println("<"+req.BaseUrl()+">", ",", "<"+req.Path()+">")
+    return true, req, res
+})
+
+LaunchServer(":8192", router)
+```
+Run it:
+> GET http://localhost:8192
+```
+<> , </>
+```
+> GET http://localhost:8192/sub
+```
+<> , </sub>
+</sub> , <>
+```
+> GET http://localhost:8192/sub/
+```
+<> , </sub/>
+</sub> , </>
+```
+> GET http://localhost:8192/sub/another
+```
+<> , </sub/another>
+</sub> , </another>
+```
+
+#### `func (Request)BaseUrl() string`
+Returns the base Url. See the examples above.
+
+#### `func (Request)OriginalPath() string`
+Returns the original path.
+
+#### `func (Request)Hostname() string`
+Returns the requesting hostname, including port number if specified.
+
+#### `func (Request)Query() map[string]string`
+Returns the query map. If one key is set multiple times, only the first setting will be valid.
+
+#### `func (Request)Method() string`
+Returns the method of the request, e.g, `GET` or `POST`
+
+#### `func (Request)Get(key string) string`
+Looks up values in HEADER. If not specified, an empty string will be returned.
+
+#### `func (Request)R() *http.Request`
+Returns the wrapped original `*Request` for advanced use. Please note that modifying its URL member will not lead modification in `Path`/`BaseUrl`, but `OriginalPath`, `Hostname` will be affected.
+
+#### `func (Request)F() map[string]Tout`
 `Tout` is `interface{}`. It is preserved for any use by midwares, e.g., storing extracted data or adding functions.

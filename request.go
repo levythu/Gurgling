@@ -17,8 +17,8 @@ type Request interface {
     // pointer to BaseUrl for modification
     p2BaseUrl() *string
 
-    // OriginalUrl is the full URL requested.
-    OriginalUrl() string
+    // OriginalPath is the full URL requested.
+    OriginalPath() string
 
     // the Hostname of the request
     Hostname() string
@@ -85,11 +85,11 @@ func (this *OriRequest)BaseUrl() string {
 func (this *OriRequest)p2BaseUrl() *string {
     return &this.baseurl
 }
-func (this *OriRequest)OriginalUrl() string {
+func (this *OriRequest)OriginalPath() string {
     return this.r.URL.Path
 }
 func (this *OriRequest)Hostname() string {
-    return this.r.URL.Path
+    return this.r.URL.Host
 }
 func (this *OriRequest)Query() map[string]string {
     return this.parsedQuery
