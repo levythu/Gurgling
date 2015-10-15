@@ -64,7 +64,7 @@ Creates and returns one default router for gateway. The mountpoint it is mounted
 #### `func ARouter() Router`
 Creates and returns one default router with `mountpoint="/"`.
 
-#### `func (*router)Use(mountpoint string, processor Tout) Router`
+#### `func (Router)Use(mountpoint string, processor Tout) Router`
 Mounts a mountable to the router at mountpoint. Mountpoint must start with `/`, regexp is currently unsupported. It will try to match the mountpoint by prefix.   
 Returns the router itself for method chaining.
 
@@ -101,25 +101,69 @@ router.Use("/", func(req Request, res Response) {
 })
 ```
 
-#### `func (*router)Get(mountpoint string, processor Tout) Router`
+#### `func (Router)Get(mountpoint string, processor Tout) Router`
 Similar to `Router.Use()` but differs in two points:
 
 - Mountpoint must match the whole word, not the prefix to trigger the rule.
 - Only GET method will trigger the rule.
 
-#### `func (*router)Post(mountpoint string, processor Tout) Router`
+#### `func (Router)Post(mountpoint string, processor Tout) Router`
 Similar to `Router.Get()` but triggered by POST request.
 
-#### `func (*router)Put(mountpoint string, processor Tout) Router`
+#### `func (Router)Put(mountpoint string, processor Tout) Router`
 Similar to `Router.Get()` but triggered by PUT request.
 
-#### `func (*router)Delete(mountpoint string, processor Tout) Router`
+#### `func (Router)Delete(mountpoint string, processor Tout) Router`
 Similar to `Router.Get()` but triggered by DELETE request.
 
-#### `func (*router)UseSpecified(mountpoint string, method string, processor Tout, isStrict bool) Router`
+#### `func (Router)UseSpecified(mountpoint string, method string, processor Tout, isStrict bool) Router`
 General version of `Router.Use()`/`Router.Get()`/`Router.Put()`/`Router.Delete()`/`Router.Post()`.  
 
 - `method` specifies the trigger method. Empty string means WILDCARD.  
 - `isStrict` indicates whether the match is performed strictly.
 
 ### Response
+The interface provided in Handler callback wrapping functions for quick response, in Express format. Since it is an interface, further hack by midwares is possible.
+
+#### `(Response)Status(content string, code int) error`
+Quick send a message and specify the return code. Note that if any head-sending operation like `Response.Status`, `Response.Send`, `Response.SendFile`, `Response.SendFileEx`, `Rsponse.SendCode`, `Response.Write` has been invoked before, this one will fail and returns `RES_HEAD_ALREADY_SENT`.
+
+It will set `Content-Type: text/plain; charset=utf-8`.
+
+#### `(Response)Send(content string) error`
+Quick invocation for `Response.Status`, using code 200. Can only be invoked successfully without any preceding head-sending invoking.
+
+#### `(Response)SendCode(code int) error`
+Sending the code without any body content. Can only be invoked successfully without any preceding head-sending invoking.
+
+#### `(Response)SendFileEx(filepath string, mime string, encoder encoding.Encoder, code int) error`
+Sending a local file with content encoding specified by `encoder`, http status code `code` and MIME type `mime`.
+
+- `filepath`: the relative file path for the file to be sent.
+- `mime`: if left empty, gurgling will try to infer it according to file extension.
+- `encoder`: if nil, a default encoder will be used, which sends the data as they are. For more encoders refer to `github.com/levythu/gurgling/encoding`
+- `code`: http status code.
+
+Can only be invoked successfully without any preceding head-sending invoking. The errors are the following:
+
+- `SENDFILE_ENCODER_NOT_READY`: encoder fails to manipulate data.
+- `SENDFILE_FILEPATH_ERROR`: fail to open target file.
+- `SENDFILE_SENT_BUT_ABORT`: start to send but then abort. **Note that in such case the header was sent, so many operation which require no preceding head-sending invoking will fail.**
+
+#### `(Response)SendFile(filepath string) error`
+Quick invocation for `Response.SendFileEx`, using code 200 and gzip compressor. MIME will be inferred. Can only be invoked successfully without any preceding head-sending invoking.
+
+#### `(Response)Set(key string, val string) error`
+Set the header. Can only be invoked successfully without any preceding head-sending invoking.
+
+#### `(Response)Get(key string) string`
+Look up the header. If the key does not exist, an empty string will be returned.
+
+#### `(Response)Write(data []byte) (int, error)`
+The original interface of `ResponseWriter`. Can be invoked any time but when the header has not been sent, it will sent the header with code=200 automatically.
+
+#### `(Response)R() http.ResponseWriter`
+Return the wrapped original `ResponseWriter` for advanced use.
+
+#### `(Response)F() map[string]Tout`
+`Tout` is `interface{}`. It is preserved for any use by midwares, e.g., storing extracted data or adding functions.
