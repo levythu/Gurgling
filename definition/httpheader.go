@@ -9,4 +9,5 @@ const (
     TRANSFER_ENCODING="Transfer-Encoding"
     CHUNCKED_TRANSFER_ENCODING="chunked"
 
+    LOCATION_HEADER="Location"
 )
