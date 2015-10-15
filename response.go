@@ -36,6 +36,9 @@ type Response interface {
     // While done, any other operation except Write is not allowed anymore.
     Status(string, int) error
 
+    // While done, any other operation except Write is not allowed anymore.
+    SendCode(int) error
+
     // get the Original resonse, only use it for advanced purpose
     R() http.ResponseWriter
 
@@ -63,6 +66,18 @@ type OriResponse struct {
 
 func (this *OriResponse)Send(content string) error {
     return this.Status(content, 200)
+}
+func (this *OriResponse)SendCode(code int) error {
+    this.lock.Lock()
+    defer this.lock.Unlock()
+
+    if (this.haveSent) {
+        return RES_HEAD_ALREADY_SENT
+    }
+    this.r.WriteHeader(code)
+    this.haveSent=true
+
+    return nil
 }
 func (this *OriResponse)Status(content string, code int) error {
     this.lock.Lock()
