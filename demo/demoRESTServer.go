@@ -3,7 +3,7 @@ package main
 import (
     "fmt"
     . "github.com/levythu/gurgling"
-    "github.com/levythu/gurgling/utilities/midwares/urlnormalizer"
+    "github.com/levythu/gurgling/midwares/urlnormalizer"
 )
 
 func main() {

@@ -12,6 +12,8 @@ type FsMidware struct {
     cacheControl CacheStrategy
 }
 
+//var sanitizer=
+
 // ignoring details about the class itself
 // making a 120-seconds caching fs-midware
 func AStaticfs(basePath string) IMidware {
