@@ -39,6 +39,9 @@ type Response interface {
     // While done, any other operation except Write is not allowed anymore.
     SendCode(int) error
 
+    // While done, any other operation except Write is not allowed anymore.
+    Redirect(string) error
+
     // get the Original resonse, only use it for advanced purpose
     R() http.ResponseWriter
 
@@ -67,6 +70,7 @@ type OriResponse struct {
 func (this *OriResponse)Send(content string) error {
     return this.Status(content, 200)
 }
+
 func (this *OriResponse)SendCode(code int) error {
     this.lock.Lock()
     defer this.lock.Unlock()
@@ -79,6 +83,7 @@ func (this *OriResponse)SendCode(code int) error {
 
     return nil
 }
+
 func (this *OriResponse)Status(content string, code int) error {
     this.lock.Lock()
     defer this.lock.Unlock()
@@ -93,6 +98,7 @@ func (this *OriResponse)Status(content string, code int) error {
 
     return err
 }
+
 func (this *OriResponse)Set(key string, val string) error {
     this.lock.Lock()
     defer this.lock.Unlock()
@@ -103,21 +109,41 @@ func (this *OriResponse)Set(key string, val string) error {
     this.r.Header().Set(key, val)
     return nil
 }
+
 func (this *OriResponse)Get(key string) string {
     return this.r.Header().Get(key)
 }
+
 func (this *OriResponse)Write(content []byte) (int, error) {
     return this.r.Write(content)
 }
+
 func (this *OriResponse)R() http.ResponseWriter {
     return this.r
 }
+
 func (this *OriResponse)F() map[string]Tout {
     return this.f
+}
+
+func (this *OriResponse)Redirect(newAddr string) error {
+    this.lock.Lock()
+    defer this.lock.Unlock()
+    if (this.haveSent) {
+        return RES_HEAD_ALREADY_SENT
+    }
+
+    this.haveSent=true
+
+    this.r.Header().Set(LOCATION_HEADER, newAddr)
+    this.r.WriteHeader(307) // moved temporarily
+
+    return nil
 }
 func (this *OriResponse)SendFile(filepath string) error {
     return this.SendFileEx(filepath, "", encoding.GZipEncoder, 200)
 }
+
 func (this *OriResponse)SendFileEx(filepath string, mime string, encoder encoding.Encoder, httpCode int) error {
     this.lock.Lock()
     defer this.lock.Unlock()

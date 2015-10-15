@@ -4,7 +4,7 @@ import (
     "fmt"
     . "github.com/levythu/gurgling"
 )
-/*
+
 func main() {
     var router=ARouter()
     var page=getPageRouter()
@@ -17,7 +17,7 @@ func main() {
     fmt.Println("Running...")
     LaunchServer(":8192", router)
 }
-*/
+/*
 func main() {
     var router=ARouter()
     var subrouter=ARouter()
@@ -36,3 +36,4 @@ func main() {
 
     LaunchServer(":8192", router)
 }
+*/
