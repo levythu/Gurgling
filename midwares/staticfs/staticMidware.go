@@ -16,7 +16,7 @@ import (
 type FsMidware struct {
     // implements IMidware
     basePath string
-    cacheControl CacheStrategy
+    CacheControl CacheStrategy
     // if non-empty, send the file representing a directory.
     RenderIndex string
     // if RenderIndex=="" or the file does not exist, use the default render.
@@ -32,7 +32,7 @@ var sanitizer=urlnormalizer.ASanitizer()
 func AStaticfs(basePath string) IMidware {
     return &FsMidware {
         basePath: basePath,
-        cacheControl: CacheStrategy(120),
+        CacheControl: CacheStrategy(120),
         RenderIndex: "index.html",
         DefaultRender: nil,
         RangeSupport: false,
@@ -91,7 +91,7 @@ func (this *FsMidware)Handler(req Request, res Response) (bool, Request, Respons
 // handle the cache and manage data transmission
 func (this *FsMidware)handleFile(req Request, res Response, filename string, fileinfo os.FileInfo) {
     const timeFormat="Mon, 02 Jan 2006 15:04:05 GMT"
-    assert(res.Set(HEADER_CACHE_CONTROL, this.cacheControl.String()))
+    assert(res.Set(HEADER_CACHE_CONTROL, this.CacheControl.String()))
     var currentModifytime=fileinfo.ModTime().UTC().Format(timeFormat)
     assert(res.Set(HEADER_LAST_MODIFIED, currentModifytime))
 

@@ -4,6 +4,7 @@ import (
     "net/http"
     "github.com/levythu/gurgling/matcher"
     . "github.com/levythu/gurgling/definition"
+    "io"
 )
 
 // Indeed an interface.
@@ -161,6 +162,10 @@ func (this *router)ServeHTTP(w http.ResponseWriter, r *http.Request) {
     this.Handler(req, res)
 }
 
+const content="<!DOCTYPE html><html><head><title>404 Not Found" +
+    "</title><style>h2 {text-align: center;}table {max-width: 35em;margin: 0 auto;padding-top: 1em;font: 1em Arial, Helvetica, sans-serif;}a {text-decoration: none;color: #0070C0;}p {padding-top: 1em;}</style></head><body><h2>404 Not Found"+
+    "</h2><table>"+
+    "<tr><td><p>by <a href=\"https://github.com/levythu/gurgling\">Gurgling "+Version+"</a></p></td></tr></table></body></html>"
 func (this *router)Handler(req Request, res Response) (bool, Request, Response) {
     var workstatus Tout=nil
     var result Tout
@@ -170,7 +175,9 @@ func (this *router)Handler(req Request, res Response) (bool, Request, Response) 
         result, workstatus=this.mat.Match(req.p2Path(), req.p2BaseUrl(), req.F(), req.Method(), workstatus)
         if result==nil {
             // No any more match, return 404
-            res.Status("404 Not Found", 404)
+            res.Set("Content-Type", "text/html; charset=utf-8")
+            res.SendCode(404)
+            io.WriteString(res, content)
             return false, req, res
         }
         var isContinue, newReq, newRes=(result.(Midware))(req, res)

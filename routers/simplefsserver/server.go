@@ -44,12 +44,11 @@ func renderDeirectory(req Request, res Response, directory string) {
     io.WriteString(res, content)
 }
 
+const content="<!DOCTYPE html><html><head><title>404 Not Found" +
+    "</title><style>h2 {text-align: center;}table {max-width: 35em;margin: 0 auto;padding-top: 1em;font: 1em Arial, Helvetica, sans-serif;}a {text-decoration: none;color: #0070C0;}p {padding-top: 1em;}</style></head><body><h2>404 Not Found"+
+    "</h2><table>"+
+    "<tr><td><p>by <a href=\"https://github.com/levythu/gurgling\">Gurgling "+Version+"</a></p></td></tr></table></body></html>"
 func notFound(req Request, res Response) {
-    var content="<!DOCTYPE html><html><head><title>404 Not Found"
-    content+="</title><style>h2 {text-align: center;}table {max-width: 35em;margin: 0 auto;padding-top: 1em;font: 1em Arial, Helvetica, sans-serif;}a {text-decoration: none;color: #0070C0;}p {padding-top: 1em;}</style></head><body><h2>404 Not Found"
-    content+="</h2><table>"
-    content+="<tr><td><p>by <a href=\"https://github.com/levythu/gurgling\">Gurgling "+Version+"</a></p></td></tr></table></body></html>"
-
     res.Set("Content-Type", "text/html; charset=utf-8")
     res.SendCode(404)
     io.WriteString(res, content)
@@ -58,6 +57,15 @@ func notFound(req Request, res Response) {
 func ASimpleFSServer(basePath string) Router {
     var fs=staticfs.AStaticfs(basePath).(*staticfs.FsMidware)
     fs.DefaultRender=renderDeirectory
+
+    return ARouter().Use(fs).Use(notFound)
+}
+func NewSimpleFSServer(basePath string, cacheStrategy staticfs.CacheStrategy, autoIndexing bool) Router {
+    var fs=staticfs.AStaticfs(basePath).(*staticfs.FsMidware)
+    if autoIndexing {
+        fs.DefaultRender=renderDeirectory
+    }
+    fs.CacheControl=cacheStrategy
 
     return ARouter().Use(fs).Use(notFound)
 }
