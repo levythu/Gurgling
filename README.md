@@ -104,7 +104,7 @@ router.Use("/", func(req Request, res Response) {
 
 #### `func (Router)Last(processor Cattail) Router`
 Mount a cattail to the end of the router.  
-`type Cattail func(Request, io.Writer)` is a function that will always get executed after the request is handled by normal routers and midwares. In such circumstance, the response header is certainly to be sent. So providing `Response` is useless. However, a `io.Writer` is still provided for appending data, although not recommended.  
+`type Cattail func(Request, Response)` is a function that will always get executed after the request is handled by normal routers and midwares. In such circumstance, the response header is certainly to be sent. So providing `Response` is useless. However, a `io.Writer` is still provided for appending data, although not recommended.  
 Like `Router.Use()`, all the Cattail will get executed in the order they are mounted in codes.
 
 #### `func (Router)Get([mountpoint string,] processor Tout) Router`
@@ -160,7 +160,7 @@ Can only be invoked successfully without any preceding head-sending invoking. Th
 
 - `SENDFILE_ENCODER_NOT_READY`: encoder fails to manipulate data.
 - `SENDFILE_FILEPATH_ERROR`: fail to open target file.
-- `SENDFILE_SENT_BUT_ABORT`: start to send but then abort. **Note that in such case the header was sent, so many operation which require no preceding head-sending invoking will fail.**
+- `SENT_BUT_ABORT`: start to send but then abort. **Note that in such case the header was sent, so many operation which require no preceding head-sending invoking will fail.**
 
 #### `func (Response)SendFile(filepath string) error`
 Quick invocation for `Response.SendFileEx`, using code 200 and gzip compressor. MIME will be inferred. Can only be invoked successfully without any preceding head-sending invoking.

@@ -32,12 +32,12 @@ type IMidware interface {
 type Terminal func(Request, Response)
 
 // a midware fixing on the rear.
-type Cattail func(Request, io.Writer)
+type Cattail func(Request, Response)
 
 // one sandwich means mounting a midware and a cattail
 type Sandwich interface {
     IMidware
-    Final(Request, io.Writer)
+    Final(Request, Response)
 }
 
 type router struct {
@@ -134,8 +134,8 @@ func (this *router)UseSpecified(mountpoint string, method string/*=""*/, process
         this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
             return processor.Handler(req, res)
         }), isStrict)
-        this.Last(func(req Request, w io.Writer) {
-            processor.Final(req, w)
+        this.Last(func(req Request, res Response) {
+            processor.Final(req, res)
         })
     case IMidware:
         // Always use Midware as storage.
@@ -197,9 +197,8 @@ const content="<!DOCTYPE html><html><head><title>404 Not Found" +
     "<tr><td><p>by <a href=\"https://github.com/levythu/gurgling\">Gurgling "+Version+"</a></p></td></tr></table></body></html>"
 func (this *router)Handler(req Request, res Response) (bool, Request, Response) {
     defer func() {
-        var wo=newWO(res.R())
         for _, elem:=range this.tailList {
-            elem(req, wo)
+            elem(req, res)
         }
     }()
     var workstatus Tout=nil

@@ -3,7 +3,6 @@ package main
 import (
     . "github.com/levythu/gurgling"
     "fmt"
-    "io"
 )
 
 func getPageRouter() Router {
@@ -24,7 +23,7 @@ func getPageRouter() Router {
         }
         res.SendFile(req.Path()[1:])
     })
-    page.Last(func(req Request, res io.Writer) {
+    page.Last(func(req Request, res Response) {
         fmt.Println("Page end.")
     })
 

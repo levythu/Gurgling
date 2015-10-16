@@ -195,7 +195,7 @@ func (this *OriResponse)SendFileEx(filepath string, mime string, encoder encodin
     fileHandler.Close()
     // No need to close request writer. There's no such an interface.
     if copyError!=nil {
-        return SENDFILE_SENT_BUT_ABORT
+        return SENT_BUT_ABORT
     }
 
     return nil

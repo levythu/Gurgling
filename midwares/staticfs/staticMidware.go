@@ -102,7 +102,7 @@ func (this *FsMidware)handleFile(req Request, res Response, filename string, fil
             if t=="no-cache" || t=="no-store" {
                 // do not check cache.
                 var err=res.SendFile(filename)
-                if err!=nil && err!=SENDFILE_SENT_BUT_ABORT {
+                if err!=nil && err!=SENT_BUT_ABORT {
                     res.Status("Internal error while reading file", 500)
                 }
                 return
@@ -123,7 +123,7 @@ func (this *FsMidware)handleFile(req Request, res Response, filename string, fil
     }
 
     var err=res.SendFile(filename)
-    if err!=nil && err!=SENDFILE_SENT_BUT_ABORT {
+    if err!=nil && err!=SENT_BUT_ABORT {
         res.Status("Internal error while reading file", 500)
     }
 }
