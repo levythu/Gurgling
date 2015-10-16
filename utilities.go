@@ -2,6 +2,7 @@ package gurgling
 
 import (
     "strings"
+    "io"
 )
 
 // Check whether the mountpoint is valid, which must start with "/"
@@ -33,4 +34,18 @@ func extractParameters(paraList ...interface{}) (string, interface{}) {
         panic(INVALID_PARAMETER)
     }
     return tmp, paraList[1]
+}
+
+// wrapper for write-only response
+type writeOnly struct {
+    // implement io.Writer
+    w io.Writer
+}
+func (this *writeOnly)Write(p []byte) (n int, err error) {
+    return this.w.Write(p)
+}
+func newWO(w io.Writer) io.Writer {
+    return &writeOnly {
+        w: w,
+    }
 }

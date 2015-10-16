@@ -14,6 +14,7 @@ type Router interface {
     Post(paraList ...interface{}) Router
     Put(paraList ...interface{}) Router
     Delete(paraList ...interface{}) Router
+    Last(Cattail) Router
     UseSpecified(string, string/*=""*/, Tout, bool) Router
     ServeHTTP(http.ResponseWriter, *http.Request)
     Handler(Request, Response) (bool, Request, Response)
@@ -29,11 +30,16 @@ type IMidware interface {
 }
 // a midware that will always return (false, nil, nil)
 type Terminal func(Request, Response)
-// Implementing http.Handler
+
+// a midware fixing on the rear.
+type Cattail func(Request, io.Writer)
+
 type router struct {
+    // Implementing http.Handler
     mountMap map[string]*router
     initMountPoint string
     mat matcher.Matcher
+    tailList []Cattail
 }
 
 // The error will be fatal.
@@ -55,6 +61,7 @@ func ARouter() Router {
         mountMap: make(map[string]*router),
         initMountPoint: "",
         mat: matcher.NewBFMatcher(),
+        tailList: []Cattail{},
     }
 }
 
@@ -75,6 +82,11 @@ func (this *router)Get(paraList ...interface{}) Router {
     var processor Tout
     mountpoint, processor=extractParameters(paraList...)
     return this.UseSpecified(mountpoint, "GET", processor, true)
+}
+
+func (this *router)Last(process Cattail) Router {
+    this.tailList=append(this.tailList, process)
+    return this
 }
 
 // a POST specified version for use
@@ -167,6 +179,12 @@ const content="<!DOCTYPE html><html><head><title>404 Not Found" +
     "</h2><table>"+
     "<tr><td><p>by <a href=\"https://github.com/levythu/gurgling\">Gurgling "+Version+"</a></p></td></tr></table></body></html>"
 func (this *router)Handler(req Request, res Response) (bool, Request, Response) {
+    defer func() {
+        var wo=newWO(res.R())
+        for _, elem:=range this.tailList {
+            elem(req, wo)
+        }
+    }()
     var workstatus Tout=nil
     var result Tout
     var oldPath=req.Path()
@@ -178,7 +196,7 @@ func (this *router)Handler(req Request, res Response) (bool, Request, Response) 
             res.Set("Content-Type", "text/html; charset=utf-8")
             res.SendCode(404)
             io.WriteString(res, content)
-            return false, req, res
+            return false, nil, nil
         }
         var isContinue, newReq, newRes=(result.(Midware))(req, res)
         if !isContinue {
