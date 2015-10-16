@@ -84,8 +84,11 @@ router.Use("/", func(req Request, res Response) (bool, Request, Response) {
 ```
 
 ##### **`IMidware`**  
-An interface which implement Midware function as `.Handler()`.  
+An interface which implement `Midware` function as `.Handler()`.  
 Since Router also implement the function, Router is a special IMidware. It will never pass request to the next.
+
+##### **`Hopper`** (`type Midware func(Request, Response) bool`)  
+Simplified version of `Midware`. It will not modify original `res` and `req`.
 
 ```go
 var anotherRouter=ARouter()

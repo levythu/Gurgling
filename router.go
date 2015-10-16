@@ -20,6 +20,7 @@ type Router interface {
     Handler(Request, Response) (bool, Request, Response)
 }
 
+// The followings are mountable: =====================================================
 // Midware is a handler that could modify anything and make the data flow continue by
 // returning manipulated Req, Res and true. otherwise return false and the Res/Req is
 // not specified.
@@ -28,6 +29,10 @@ type Midware func(Request, Response) (bool, Request, Response)
 type IMidware interface {
     Handler(Request, Response) (bool, Request, Response)
 }
+
+// Simplified midware, keep req/res
+type Hopper func(Request, Response) bool
+
 // a midware that will always return (false, nil, nil)
 type Terminal func(Request, Response)
 
@@ -39,6 +44,7 @@ type Sandwich interface {
     IMidware
     Final(Request, Response)
 }
+// ====================================================================================
 
 type router struct {
     // Implementing http.Handler
@@ -158,6 +164,14 @@ func (this *router)UseSpecified(mountpoint string, method string/*=""*/, process
         this.mat.AddRule(mountpoint, method, Midware(processor), isStrict)
     case Midware:
         this.mat.AddRule(mountpoint, method, processor, isStrict)
+    case Hopper:
+        this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
+            return processor(req, res), req, res
+        }), isStrict)
+    case func(Request, Response) bool:
+        this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
+            return processor(req, res), req, res
+        }), isStrict)
     default:
         panic(INVALID_INVALID_USE)
     }
