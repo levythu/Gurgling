@@ -37,6 +37,7 @@ type Request interface {
 
     // get data in the headers, if not specified, return ""
     Get(string) string
+    GetAll(key string) []string
 
     // get the Original resonse, only use it for advanced purpose
     R() *http.Request
@@ -102,6 +103,9 @@ func (this *OriRequest)Method() string {
 }
 func (this *OriRequest)Get(key string) string {
     return this.r.Header.Get(key)
+}
+func (this *OriRequest)GetAll(key string) []string {
+    return this.r.Header[http.CanonicalHeaderKey(key)]
 }
 func (this *OriRequest)R() *http.Request {
     return this.r
