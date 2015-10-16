@@ -2,6 +2,7 @@ package main
 
 import (
     . "github.com/levythu/gurgling"
+    "fmt"
 )
 
 func getPageRouter() Router {
@@ -21,6 +22,9 @@ func getPageRouter() Router {
             return
         }
         res.SendFile(req.Path()[1:])
+    })
+    page.Last(func(req Request, res Response) {
+        fmt.Println("Page end.")
     })
 
     return page

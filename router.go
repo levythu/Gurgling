@@ -4,15 +4,17 @@ import (
     "net/http"
     "github.com/levythu/gurgling/matcher"
     . "github.com/levythu/gurgling/definition"
+    "io"
 )
 
 // Indeed an interface.
 type Router interface {
-    Use(string, Tout) Router
-    Get(string, Tout) Router
-    Post(string, Tout) Router
-    Put(string, Tout) Router
-    Delete(string, Tout) Router
+    Use(paraList ...interface{}) Router
+    Get(paraList ...interface{}) Router
+    Post(paraList ...interface{}) Router
+    Put(paraList ...interface{}) Router
+    Delete(paraList ...interface{}) Router
+    Last(Cattail) Router
     UseSpecified(string, string/*=""*/, Tout, bool) Router
     ServeHTTP(http.ResponseWriter, *http.Request)
     Handler(Request, Response) (bool, Request, Response)
@@ -28,11 +30,22 @@ type IMidware interface {
 }
 // a midware that will always return (false, nil, nil)
 type Terminal func(Request, Response)
-// Implementing http.Handler
+
+// a midware fixing on the rear.
+type Cattail func(Request, Response)
+
+// one sandwich means mounting a midware and a cattail
+type Sandwich interface {
+    IMidware
+    Final(Request, Response)
+}
+
 type router struct {
+    // Implementing http.Handler
     mountMap map[string]*router
     initMountPoint string
     mat matcher.Matcher
+    tailList []Cattail
 }
 
 // The error will be fatal.
@@ -54,32 +67,55 @@ func ARouter() Router {
         mountMap: make(map[string]*router),
         initMountPoint: "",
         mat: matcher.NewBFMatcher(),
+        tailList: []Cattail{},
     }
 }
 
 // processor must be a IMidware(including Router)/Midware or Terminal, otherwise panic.
 // MountPoint should be valid, otherwise panic.
-func (this *router)Use(mountpoint string, processor Tout) Router {
+//func (this *router)Use(mountpoint string, processor Tout) Router
+//func (this *router)Use(processor Tout) Router
+func (this *router)Use(paraList ...interface{}) Router {
+    var mountpoint string
+    var processor Tout
+    mountpoint, processor=extractParameters(paraList...)
     return this.UseSpecified(mountpoint, "", processor, false)
 }
 
 // a GET specified version for use
-func (this *router)Get(mountpoint string, processor Tout) Router {
+func (this *router)Get(paraList ...interface{}) Router {
+    var mountpoint string
+    var processor Tout
+    mountpoint, processor=extractParameters(paraList...)
+    return this.UseSpecified(mountpoint, "GET", processor, true)
+}
+
+func (this *router)Last(process Cattail) Router {
+    this.tailList=append(this.tailList, process)
+    return this
+}
+
+// a POST specified version for use
+func (this *router)Post(paraList ...interface{}) Router {
+    var mountpoint string
+    var processor Tout
+    mountpoint, processor=extractParameters(paraList...)
     return this.UseSpecified(mountpoint, "GET", processor, true)
 }
 
 // a POST specified version for use
-func (this *router)Post(mountpoint string, processor Tout) Router {
-    return this.UseSpecified(mountpoint, "GET", processor, true)
-}
-
-// a POST specified version for use
-func (this *router)Put(mountpoint string, processor Tout) Router {
+func (this *router)Put(paraList ...interface{}) Router {
+    var mountpoint string
+    var processor Tout
+    mountpoint, processor=extractParameters(paraList...)
     return this.UseSpecified(mountpoint, "PUT", processor, true)
 }
 
 // a POST specified version for use
-func (this *router)Delete(mountpoint string, processor Tout) Router {
+func (this *router)Delete(paraList ...interface{}) Router {
+    var mountpoint string
+    var processor Tout
+    mountpoint, processor=extractParameters(paraList...)
     return this.UseSpecified(mountpoint, "DELETE", processor, true)
 }
 
@@ -90,6 +126,17 @@ func (this *router)UseSpecified(mountpoint string, method string/*=""*/, process
     }
 
     switch processor:=processor.(type) {
+    case Sandwich:
+        // Can only be mounted to the root("/")
+        if (mountpoint!="" && mountpoint!="/") || isStrict || method!="" {
+            panic(SANDWICH_MOUNT_ERROR)
+        }
+        this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
+            return processor.Handler(req, res)
+        }), isStrict)
+        this.Last(func(req Request, res Response) {
+            processor.Final(req, res)
+        })
     case IMidware:
         // Always use Midware as storage.
         this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
@@ -144,7 +191,16 @@ func (this *router)ServeHTTP(w http.ResponseWriter, r *http.Request) {
     this.Handler(req, res)
 }
 
+const content="<!DOCTYPE html><html><head><title>404 Not Found" +
+    "</title><style>h2 {text-align: center;}table {max-width: 35em;margin: 0 auto;padding-top: 1em;font: 1em Arial, Helvetica, sans-serif;}a {text-decoration: none;color: #0070C0;}p {padding-top: 1em;}</style></head><body><h2>404 Not Found"+
+    "</h2><table>"+
+    "<tr><td><p>by <a href=\"https://github.com/levythu/gurgling\">Gurgling "+Version+"</a></p></td></tr></table></body></html>"
 func (this *router)Handler(req Request, res Response) (bool, Request, Response) {
+    defer func() {
+        for _, elem:=range this.tailList {
+            elem(req, res)
+        }
+    }()
     var workstatus Tout=nil
     var result Tout
     var oldPath=req.Path()
@@ -153,8 +209,10 @@ func (this *router)Handler(req Request, res Response) (bool, Request, Response) 
         result, workstatus=this.mat.Match(req.p2Path(), req.p2BaseUrl(), req.F(), req.Method(), workstatus)
         if result==nil {
             // No any more match, return 404
-            res.Status("Resource not found. \nby gurgling", 404)
-            return false, req, res
+            res.Set("Content-Type", "text/html; charset=utf-8")
+            res.SendCode(404)
+            io.WriteString(res, content)
+            return false, nil, nil
         }
         var isContinue, newReq, newRes=(result.(Midware))(req, res)
         if !isContinue {

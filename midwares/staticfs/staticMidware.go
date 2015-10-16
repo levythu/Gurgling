@@ -16,11 +16,13 @@ import (
 type FsMidware struct {
     // implements IMidware
     basePath string
-    cacheControl CacheStrategy
+    CacheControl CacheStrategy
     // if non-empty, send the file representing a directory.
     RenderIndex string
     // if RenderIndex=="" or the file does not exist, use the default render.
     DefaultRender func(Request, Response, string)
+    // TODO: reserved for flag of supporting range transport.
+    RangeSupport bool
 }
 
 var sanitizer=urlnormalizer.ASanitizer()
@@ -30,9 +32,10 @@ var sanitizer=urlnormalizer.ASanitizer()
 func AStaticfs(basePath string) IMidware {
     return &FsMidware {
         basePath: basePath,
-        cacheControl: CacheStrategy(120),
+        CacheControl: CacheStrategy(120),
         RenderIndex: "index.html",
         DefaultRender: nil,
+        RangeSupport: false,
     }
 }
 
@@ -43,6 +46,10 @@ func assert(err error) {
 }
 
 func (this *FsMidware)Handler(req Request, res Response) (bool, Request, Response) {
+    if req.Method()!="GET" {
+        return true, req, res
+    }
+
     var isContinue bool
     isContinue, req, res=sanitizer.Handler(req, res)
     if !isContinue {
@@ -84,7 +91,7 @@ func (this *FsMidware)Handler(req Request, res Response) (bool, Request, Respons
 // handle the cache and manage data transmission
 func (this *FsMidware)handleFile(req Request, res Response, filename string, fileinfo os.FileInfo) {
     const timeFormat="Mon, 02 Jan 2006 15:04:05 GMT"
-    assert(res.Set(HEADER_CACHE_CONTROL, this.cacheControl.String()))
+    assert(res.Set(HEADER_CACHE_CONTROL, this.CacheControl.String()))
     var currentModifytime=fileinfo.ModTime().UTC().Format(timeFormat)
     assert(res.Set(HEADER_LAST_MODIFIED, currentModifytime))
 
@@ -95,7 +102,7 @@ func (this *FsMidware)handleFile(req Request, res Response, filename string, fil
             if t=="no-cache" || t=="no-store" {
                 // do not check cache.
                 var err=res.SendFile(filename)
-                if err!=nil && err!=SENDFILE_SENT_BUT_ABORT {
+                if err!=nil && err!=SENT_BUT_ABORT {
                     res.Status("Internal error while reading file", 500)
                 }
                 return
@@ -109,14 +116,14 @@ func (this *FsMidware)handleFile(req Request, res Response, filename string, fil
             //fmt.Println(ts, nts)
             if !ts.Before(nts) {
                 // File not modified. return 304
-                assert(res.SendCode(304))
+                res.SendCode(304)
                 return
             }
         }
     }
 
     var err=res.SendFile(filename)
-    if err!=nil && err!=SENDFILE_SENT_BUT_ABORT {
+    if err!=nil && err!=SENT_BUT_ABORT {
         res.Status("Internal error while reading file", 500)
     }
 }

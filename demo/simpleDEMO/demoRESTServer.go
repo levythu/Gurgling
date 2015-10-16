@@ -3,17 +3,17 @@ package main
 import (
     "fmt"
     . "github.com/levythu/gurgling"
-    "github.com/levythu/gurgling/midwares/urlnormalizer"
     "github.com/levythu/gurgling/midwares/staticfs"
+    "github.com/levythu/gurgling/midwares/analyzer"
 )
 
 func main() {
     var router=ARouter()
     var page=getPageRouter()
 
-    router.Use("/", urlnormalizer.ASanitizer())
-    router.Use("/", staticfs.AStaticfs("fordbg/"))
-    router.Get("/", func(req Request, res Response) {
+    router.Use(analyzer.ASimpleAnalyzer())
+    router.Use(staticfs.AStaticfs("public/"))
+    router.Get(func(req Request, res Response) {
         res.Send("This is index.")
     })
     router.Use("/page", page)

@@ -24,7 +24,7 @@ func main() {
     var router=ARouter()
 
     // Mount one handler
-    router.Get("/", func(req Request, res Response) {
+    router.Get(func(req Request, res Response) {
         res.Send("Hello, World!")
     })
 
@@ -42,7 +42,7 @@ func main() {
 var pageRouter=ARouter()
 
 // Mount handler and midware
-pageRouter.Use("/", func(req Request, res Response) (bool, Request, Response) {
+pageRouter.Use(func(req Request, res Response) (bool, Request, Response) {
     fmt.Println(req.Path())
 	return true, req, res
 })
@@ -64,9 +64,10 @@ Creates and returns one default router for gateway. The mountpoint it is mounted
 #### `func ARouter() Router`
 Creates and returns one default router with `mountpoint="/"`.
 
-#### `func (Router)Use(mountpoint string, processor Tout) Router`
+#### `func (Router)Use([mountpoint string], processor Tout) Router`
 Mounts a mountable to the router at mountpoint. Mountpoint must start with `/`, regexp is currently unsupported. It will try to match the mountpoint by prefix.   
-Returns the router itself for method chaining.
+Returns the router itself for method chaining.  
+**NOTE: the first parameter could be omitted and will be set to "/" by default**
 
 Mountable includes the following items:
 
@@ -101,19 +102,24 @@ router.Use("/", func(req Request, res Response) {
 })
 ```
 
-#### `func (Router)Get(mountpoint string, processor Tout) Router`
+#### `func (Router)Last(processor Cattail) Router`
+Mount a cattail to the end of the router.  
+`type Cattail func(Request, Response)` is a function that will always get executed after the request is handled by normal routers and midwares. In such circumstance, the response header is certainly to be sent. So providing `Response` is useless. However, a `io.Writer` is still provided for appending data, although not recommended.  
+Like `Router.Use()`, all the Cattail will get executed in the order they are mounted in codes.
+
+#### `func (Router)Get([mountpoint string,] processor Tout) Router`
 Similar to `Router.Use()` but differs in two points:
 
 - Mountpoint must match the whole word, not the prefix to trigger the rule.
 - Only GET method will trigger the rule.
 
-#### `func (Router)Post(mountpoint string, processor Tout) Router`
+#### `func (Router)Post([mountpoint string,] processor Tout) Router`
 Similar to `Router.Get()` but triggered by POST request.
 
-#### `func (Router)Put(mountpoint string, processor Tout) Router`
+#### `func (Router)Put([mountpoint string,] processor Tout) Router`
 Similar to `Router.Get()` but triggered by PUT request.
 
-#### `func (Router)Delete(mountpoint string, processor Tout) Router`
+#### `func (Router)Delete([mountpoint string,] processor Tout) Router`
 Similar to `Router.Get()` but triggered by DELETE request.
 
 #### `func (Router)UseSpecified(mountpoint string, method string, processor Tout, isStrict bool) Router`
@@ -154,7 +160,7 @@ Can only be invoked successfully without any preceding head-sending invoking. Th
 
 - `SENDFILE_ENCODER_NOT_READY`: encoder fails to manipulate data.
 - `SENDFILE_FILEPATH_ERROR`: fail to open target file.
-- `SENDFILE_SENT_BUT_ABORT`: start to send but then abort. **Note that in such case the header was sent, so many operation which require no preceding head-sending invoking will fail.**
+- `SENT_BUT_ABORT`: start to send but then abort. **Note that in such case the header was sent, so many operation which require no preceding head-sending invoking will fail.**
 
 #### `func (Response)SendFile(filepath string) error`
 Quick invocation for `Response.SendFileEx`, using code 200 and gzip compressor. MIME will be inferred. Can only be invoked successfully without any preceding head-sending invoking.
