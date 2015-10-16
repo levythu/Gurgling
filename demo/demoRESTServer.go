@@ -4,6 +4,7 @@ import (
     "fmt"
     . "github.com/levythu/gurgling"
     "github.com/levythu/gurgling/midwares/urlnormalizer"
+    "github.com/levythu/gurgling/midwares/staticfs"
 )
 
 func main() {
@@ -11,6 +12,7 @@ func main() {
     var page=getPageRouter()
 
     router.Use("/", urlnormalizer.ASanitizer())
+    router.Use("/", staticfs.AStaticfs("fordbg/"))
     router.Get("/", func(req Request, res Response) {
         res.Send("This is index.")
     })

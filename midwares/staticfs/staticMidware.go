@@ -6,6 +6,7 @@ import (
     "os"
     "path"
     "strings"
+    //"fmt"
     "time"
 )
 
@@ -82,9 +83,10 @@ func (this *FsMidware)Handler(req Request, res Response) (bool, Request, Respons
 
 // handle the cache and manage data transmission
 func (this *FsMidware)handleFile(req Request, res Response, filename string, fileinfo os.FileInfo) {
-    const timeFormat="Mon, 19 Nov 2012 08:38:01 GMT"
+    const timeFormat="Mon, 02 Jan 2006 15:04:05 GMT"
     assert(res.Set(HEADER_CACHE_CONTROL, this.cacheControl.String()))
-    assert(res.Set(HEADER_LAST_MODIFIED, fileinfo.ModTime().Format(timeFormat)))
+    var currentModifytime=fileinfo.ModTime().UTC().Format(timeFormat)
+    assert(res.Set(HEADER_LAST_MODIFIED, currentModifytime))
 
     var strategy=req.GetAll(HEADER_CACHE_CONTROL)
     if strategy!=nil {
@@ -103,7 +105,9 @@ func (this *FsMidware)handleFile(req Request, res Response, filename string, fil
 
     if mtime:=req.Get(HEADER_MODIFICATION_TIMESTAMP); mtime!="" {
         if ts, err:=time.Parse(timeFormat, mtime); err==nil {
-            if !ts.Before(fileinfo.ModTime()) {
+            nts, _:=time.Parse(timeFormat, currentModifytime)
+            //fmt.Println(ts, nts)
+            if !ts.Before(nts) {
                 // File not modified. return 304
                 assert(res.SendCode(304))
                 return
