@@ -4,5 +4,7 @@
 [x] Add url normaliser
 [x] Refine interface
 [ ] Test it!
-[ ] Add sandwich
-[ ] Add logger
+[x] Add sandwich
+[x] Add logger
+[x] exp on infinite loop - loop forever
+[ ] add panic capture

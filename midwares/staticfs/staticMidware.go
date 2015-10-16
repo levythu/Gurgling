@@ -116,7 +116,7 @@ func (this *FsMidware)handleFile(req Request, res Response, filename string, fil
             //fmt.Println(ts, nts)
             if !ts.Before(nts) {
                 // File not modified. return 304
-                assert(res.SendCode(304))
+                res.SendCode(304)
                 return
             }
         }

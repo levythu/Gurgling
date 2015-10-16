@@ -2,6 +2,9 @@ package analyzer
 
 import (
     . "github.com/levythu/gurgling"
+    . "github.com/levythu/gurgling/definition"
+    "github.com/levythu/gurgling/encoding"
+    "net/http"
 )
 
 // A wrapper for simple Response to Hack the data, recording some events
@@ -31,14 +34,14 @@ func (this *logResponse)Write(c []byte) (int, error) {
     return this.o.Write(c)
 }
 func (this *logResponse)SendFileEx(f string, d string, e encoding.Encoder, c int) error {
-    var err==this.o.SendFileEx(f, d, e, c)
+    var err=this.o.SendFileEx(f, d, e, c)
     if err==nil || err==SENT_BUT_ABORT {
         this.OnHeadSent(this.o, c)
     }
     return err
 }
 func (this *logResponse)SendFile(f string) error {
-    var err==this.o.SendFile(f)
+    var err=this.o.SendFile(f)
     if err==nil || err==SENT_BUT_ABORT {
         this.OnHeadSent(this.o, 200)
     }
@@ -47,14 +50,14 @@ func (this *logResponse)SendFile(f string) error {
 func (this *logResponse)Status(d string, c int) error {
     var err=this.o.Status(d, c)
     if err==nil || err==SENT_BUT_ABORT {
-        this.OnHeadSent(this.o, 200)
+        this.OnHeadSent(this.o, c)
     }
     return err
 }
 func (this *logResponse)SendCode(c int) error {
     var err=this.o.SendCode(c)
     if err==nil || err==SENT_BUT_ABORT {
-        this.OnHeadSent(this.o, 200)
+        this.OnHeadSent(this.o, c)
     }
     return err
 }

@@ -4,6 +4,7 @@ import (
     . "github.com/levythu/gurgling"
     . "github.com/levythu/gurgling/definition"
     "github.com/levythu/gurgling/midwares/staticfs"
+    "github.com/levythu/gurgling/midwares/analyzer"
     "io/ioutil"
     "io"
 )
@@ -41,6 +42,7 @@ func renderDeirectory(req Request, res Response, directory string) {
     content+="<tr><td><p>by <a href=\"https://github.com/levythu/gurgling\">Gurgling "+Version+"</a></p></td></tr></table></body></html>"
 
     res.Set("Content-Type", "text/html; charset=utf-8")
+    res.SendCode(200)
     io.WriteString(res, content)
 }
 
@@ -56,16 +58,18 @@ func notFound(req Request, res Response) {
 
 func ASimpleFSServer(basePath string) Router {
     var fs=staticfs.AStaticfs(basePath).(*staticfs.FsMidware)
+    var ay=analyzer.ASimpleAnalyzer()
     fs.DefaultRender=renderDeirectory
 
-    return ARouter().Use(fs).Use(notFound)
+    return ARouter().Use(ay).Use(fs)
 }
 func NewSimpleFSServer(basePath string, cacheStrategy staticfs.CacheStrategy, autoIndexing bool) Router {
     var fs=staticfs.AStaticfs(basePath).(*staticfs.FsMidware)
     if autoIndexing {
         fs.DefaultRender=renderDeirectory
     }
+    var ay=analyzer.ASimpleAnalyzer()
     fs.CacheControl=cacheStrategy
 
-    return ARouter().Use(fs).Use(notFound)
+    return ARouter().Use(ay).Use(fs)
 }
