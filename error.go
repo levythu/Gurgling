@@ -16,4 +16,5 @@ var (
     SENDFILE_ENCODER_NOT_READY=errors.New("Encoder fails to create IO.")
     SENDFILE_FILEPATH_ERROR=errors.New("File path error.")
     SENDFILE_SENT_BUT_ABORT=errors.New("Filesending is aborted due to error.")
+    SANDWICH_MOUNT_ERROR=errors.New("Sandwich could only be mounted to / in non-strict mode. (Try Router.Use(Sandwich))")
 )

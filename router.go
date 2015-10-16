@@ -34,6 +34,12 @@ type Terminal func(Request, Response)
 // a midware fixing on the rear.
 type Cattail func(Request, io.Writer)
 
+// one sandwich means mounting a midware and a cattail
+type Sandwich interface {
+    IMidware
+    Final(Request, io.Writer)
+}
+
 type router struct {
     // Implementing http.Handler
     mountMap map[string]*router
@@ -120,6 +126,17 @@ func (this *router)UseSpecified(mountpoint string, method string/*=""*/, process
     }
 
     switch processor:=processor.(type) {
+    case Sandwich:
+        // Can only be mounted to the root("/")
+        if (mountpoint!="" && mountpoint!="/") || isStrict || method!="" {
+            panic(SANDWICH_MOUNT_ERROR)
+        }
+        this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
+            return processor.Handler(req, res)
+        }), isStrict)
+        this.Last(func(req Request, w io.Writer) {
+            processor.Final(req, w)
+        })
     case IMidware:
         // Always use Midware as storage.
         this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {

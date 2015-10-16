@@ -102,6 +102,11 @@ router.Use("/", func(req Request, res Response) {
 })
 ```
 
+#### `func (Router)Last(processor Cattail) Router`
+Mount a cattail to the end of the router.  
+`type Cattail func(Request, io.Writer)` is a function that will always get executed after the request is handled by normal routers and midwares. In such circumstance, the response header is certainly to be sent. So providing `Response` is useless. However, a `io.Writer` is still provided for appending data, although not recommended.  
+Like `Router.Use()`, all the Cattail will get executed in the order they are mounted in codes.
+
 #### `func (Router)Get([mountpoint string,] processor Tout) Router`
 Similar to `Router.Use()` but differs in two points:
 
