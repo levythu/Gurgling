@@ -5,3 +5,4 @@
 [x] Refine interface
 [ ] Test it!
 [ ] Add sandwich
+[ ] Add logger

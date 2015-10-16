@@ -46,6 +46,10 @@ func assert(err error) {
 }
 
 func (this *FsMidware)Handler(req Request, res Response) (bool, Request, Response) {
+    if req.Method()!="GET" {
+        return true, req, res
+    }
+
     var isContinue bool
     isContinue, req, res=sanitizer.Handler(req, res)
     if !isContinue {
