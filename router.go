@@ -170,7 +170,7 @@ func (this *router)Handler(req Request, res Response) (bool, Request, Response) 
         result, workstatus=this.mat.Match(req.p2Path(), req.p2BaseUrl(), req.F(), req.Method(), workstatus)
         if result==nil {
             // No any more match, return 404
-            res.Status("Resource not found. \nby gurgling", 404)
+            res.Status("404 Not Found", 404)
             return false, req, res
         }
         var isContinue, newReq, newRes=(result.(Midware))(req, res)
