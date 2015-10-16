@@ -8,11 +8,11 @@ import (
 
 // Indeed an interface.
 type Router interface {
-    Use(string, Tout) Router
-    Get(string, Tout) Router
-    Post(string, Tout) Router
-    Put(string, Tout) Router
-    Delete(string, Tout) Router
+    Use(paraList ...interface{}) Router
+    Get(paraList ...interface{}) Router
+    Post(paraList ...interface{}) Router
+    Put(paraList ...interface{}) Router
+    Delete(paraList ...interface{}) Router
     UseSpecified(string, string/*=""*/, Tout, bool) Router
     ServeHTTP(http.ResponseWriter, *http.Request)
     Handler(Request, Response) (bool, Request, Response)
@@ -59,27 +59,44 @@ func ARouter() Router {
 
 // processor must be a IMidware(including Router)/Midware or Terminal, otherwise panic.
 // MountPoint should be valid, otherwise panic.
-func (this *router)Use(mountpoint string, processor Tout) Router {
+//func (this *router)Use(mountpoint string, processor Tout) Router
+//func (this *router)Use(processor Tout) Router
+func (this *router)Use(paraList ...interface{}) Router {
+    var mountpoint string
+    var processor Tout
+    mountpoint, processor=extractParameters(paraList...)
     return this.UseSpecified(mountpoint, "", processor, false)
 }
 
 // a GET specified version for use
-func (this *router)Get(mountpoint string, processor Tout) Router {
+func (this *router)Get(paraList ...interface{}) Router {
+    var mountpoint string
+    var processor Tout
+    mountpoint, processor=extractParameters(paraList...)
     return this.UseSpecified(mountpoint, "GET", processor, true)
 }
 
 // a POST specified version for use
-func (this *router)Post(mountpoint string, processor Tout) Router {
+func (this *router)Post(paraList ...interface{}) Router {
+    var mountpoint string
+    var processor Tout
+    mountpoint, processor=extractParameters(paraList...)
     return this.UseSpecified(mountpoint, "GET", processor, true)
 }
 
 // a POST specified version for use
-func (this *router)Put(mountpoint string, processor Tout) Router {
+func (this *router)Put(paraList ...interface{}) Router {
+    var mountpoint string
+    var processor Tout
+    mountpoint, processor=extractParameters(paraList...)
     return this.UseSpecified(mountpoint, "PUT", processor, true)
 }
 
 // a POST specified version for use
-func (this *router)Delete(mountpoint string, processor Tout) Router {
+func (this *router)Delete(paraList ...interface{}) Router {
+    var mountpoint string
+    var processor Tout
+    mountpoint, processor=extractParameters(paraList...)
     return this.UseSpecified(mountpoint, "DELETE", processor, true)
 }
 

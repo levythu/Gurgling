@@ -11,9 +11,9 @@ func main() {
     var router=ARouter()
     var page=getPageRouter()
 
-    router.Use("/", urlnormalizer.ASanitizer())
-    router.Use("/", staticfs.AStaticfs("fordbg/"))
-    router.Get("/", func(req Request, res Response) {
+    router.Use(urlnormalizer.ASanitizer())
+    router.Use(staticfs.AStaticfs("fordbg/"))
+    router.Get(func(req Request, res Response) {
         res.Send("This is index.")
     })
     router.Use("/page", page)

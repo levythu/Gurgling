@@ -17,3 +17,20 @@ func checkMountpointValidity(mountpoint *string) bool {
     *mountpoint=(*mountpoint)[:ends]
     return true
 }
+
+// used for quick invoke of use/get/...
+// if one parameter, returns "/", p1
+// if two, returns p1, p2
+func extractParameters(paraList ...interface{}) (string, interface{}) {
+    if len(paraList)==0 || len(paraList)>2 {
+        panic(INVALID_PARAMETER)
+    }
+    if len(paraList)==1 {
+        return "/", paraList[0]
+    }
+    var tmp, ok=paraList[0].(string)
+    if !ok {
+        panic(INVALID_PARAMETER)
+    }
+    return tmp, paraList[1]
+}

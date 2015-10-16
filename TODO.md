@@ -3,3 +3,4 @@
 [x] Modify the way router handles 404
 [x] Add url normaliser
 [ ] Refine interface
+[ ] Test it!
