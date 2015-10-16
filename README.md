@@ -5,7 +5,7 @@ An extremely-light framework for Golang to build restful API and Website.
 
 ## Quick Start
 
-### Install
+### Install it
 
 ```sh
 go get github.com/levythu/gurgling
@@ -28,7 +28,7 @@ func main() {
         res.Send("Hello, World!")
     })
 
-    // Mount the gate to net/http and run the server
+    // Launch the server
     fmt.Println("Running...")
     router.Launch(":8080")
 }
@@ -52,7 +52,7 @@ func main() {
 }
 ```
 
-### Create sub-routers and mount them
+### Then, create sub-routers and mount them
 
 ```go
 
@@ -60,9 +60,9 @@ func main() {
 var pageRouter=ARouter()
 
 // Mount handler and midware
-pageRouter.Use(func(req Request, res Response) (bool, Request, Response) {
+pageRouter.Use(func(req Request, res Response) bool {
     fmt.Println(req.Path())
-	return true, req, res
+	return true
 })
 pageRouter.Get("/editor", func(req Request, res Response) {
     res.Send("Here's the editor.")
