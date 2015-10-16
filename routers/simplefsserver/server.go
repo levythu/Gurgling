@@ -23,8 +23,20 @@ func renderDeirectory(req Request, res Response, directory string) {
     content+=req.Path()
     content+="</h2><table>"
 
+    var filenames=[]string{"./", "../"}
     for _, elem:=range fileList {
-        content+="<tr><td><a href=\""+elem.Name()+"\">"+elem.Name()+"</a></td></tr>"
+        var tN=elem.Name()
+        if tN==".." || tN=="." {
+            continue
+        }
+        if elem.IsDir() {
+            filenames=append(filenames, tN+"/")
+        } else {
+            filenames=append(filenames, tN)
+        }
+    }
+    for _, elem:=range filenames {
+        content+="<tr><td><a href=\""+elem+"\">"+elem+"</a></td></tr>"
     }
     content+="<tr><td><p>by <a href=\"https://github.com/levythu/gurgling\">Gurgling "+Version+"</a></p></td></tr></table></body></html>"
 
