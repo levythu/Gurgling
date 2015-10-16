@@ -21,6 +21,8 @@ type FsMidware struct {
     RenderIndex string
     // if RenderIndex=="" or the file does not exist, use the default render.
     DefaultRender func(Request, Response, string)
+    // TODO: reserved for flag of supporting range transport.
+    RangeSupport bool
 }
 
 var sanitizer=urlnormalizer.ASanitizer()
@@ -33,6 +35,7 @@ func AStaticfs(basePath string) IMidware {
         cacheControl: CacheStrategy(120),
         RenderIndex: "index.html",
         DefaultRender: nil,
+        RangeSupport: false,
     }
 }
 

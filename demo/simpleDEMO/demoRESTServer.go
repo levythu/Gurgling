@@ -12,7 +12,7 @@ func main() {
     var page=getPageRouter()
 
     router.Use(urlnormalizer.ASanitizer())
-    router.Use(staticfs.AStaticfs("fordbg/"))
+    router.Use(staticfs.AStaticfs("public/"))
     router.Get(func(req Request, res Response) {
         res.Send("This is index.")
     })
