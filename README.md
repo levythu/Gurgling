@@ -131,6 +131,10 @@ General version of `Router.Use()`/`Router.Get()`/`Router.Put()`/`Router.Delete()
 - `method` specifies the trigger method. Empty string means WILDCARD.  
 - `isStrict` indicates whether the match is performed strictly.
 
+#### `func (Router)SetErrorHandler(handler RouterErrorCatcher) Router`
+Set the runtime error handler to recover from panic. The handler is `func(Request, Response, interface{})`, the third parameter of which is the panic content. Note that if there is any panic in the handler, the whole program will suffer from it, too.  
+The default handler is tp render a `500 Internal Error` page to client. If set to nil, the router will not recover from panic and it is good for debugging.
+
 ### Response
 The interface provided in Handler callback wrapping functions for quick response, in Express format. Since it is an interface, further hack by midwares is possible.
 

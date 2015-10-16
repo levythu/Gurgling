@@ -14,6 +14,7 @@ type Router interface {
     Post(paraList ...interface{}) Router
     Put(paraList ...interface{}) Router
     Delete(paraList ...interface{}) Router
+    SetErrorHandler(RouterErrorCatcher) Router
     Last(Cattail) Router
     UseSpecified(string, string/*=""*/, Tout, bool) Router
     ServeHTTP(http.ResponseWriter, *http.Request)
@@ -52,6 +53,8 @@ type router struct {
     initMountPoint string
     mat matcher.Matcher
     tailList []Cattail
+    // if nil, do not catch error
+    catcher RouterErrorCatcher
 }
 
 // The error will be fatal.
@@ -63,6 +66,8 @@ func GetRouter(MountPoint string) Router {
         mountMap: make(map[string]*router),
         initMountPoint: MountPoint,
         mat: matcher.NewBFMatcher(),
+        tailList: []Cattail{},
+        catcher: DefaultCacher,
     }
 }
 
@@ -74,6 +79,7 @@ func ARouter() Router {
         initMountPoint: "",
         mat: matcher.NewBFMatcher(),
         tailList: []Cattail{},
+        catcher: DefaultCacher,
     }
 }
 
@@ -211,6 +217,12 @@ const content404="<!DOCTYPE html><html><head><title>404 Not Found" +
     "<tr><td><div></div><p>by <a href=\"https://github.com/levythu/gurgling\">Gurgling "+Version+"</a></p></td></tr></table></body></html>"
 func (this *router)Handler(req Request, res Response) (bool, Request, Response) {
     defer func() {
+        if this.catcher!=nil {
+            if problem:=recover(); problem!=nil {
+                this.catcher(req, res, problem)
+                return
+            }
+        }
         for _, elem:=range this.tailList {
             elem(req, res)
         }
@@ -239,4 +251,8 @@ func (this *router)Handler(req Request, res Response) (bool, Request, Response) 
         req=newReq
         res=newRes
     }
+}
+func (this *router)SetErrorHandler(proc RouterErrorCatcher) Router {
+    this.catcher=proc
+    return this
 }
