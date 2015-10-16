@@ -94,7 +94,7 @@ func (this *FsMidware)handleFile(req Request, res Response, filename string, fil
     assert(res.Set(HEADER_CACHE_CONTROL, this.CacheControl.String()))
     var currentModifytime=fileinfo.ModTime().UTC().Format(timeFormat)
     assert(res.Set(HEADER_LAST_MODIFIED, currentModifytime))
-
+    /*
     var strategy=req.GetAll(HEADER_CACHE_CONTROL)
     if strategy!=nil {
         for _, e:=range strategy {
@@ -109,7 +109,7 @@ func (this *FsMidware)handleFile(req Request, res Response, filename string, fil
             }
         }
     }
-
+    */
     if mtime:=req.Get(HEADER_MODIFICATION_TIMESTAMP); mtime!="" {
         if ts, err:=time.Parse(timeFormat, mtime); err==nil {
             nts, _:=time.Parse(timeFormat, currentModifytime)
