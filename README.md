@@ -24,7 +24,7 @@ func main() {
     var router=ARouter()
 
     // Mount one handler
-    router.Get("/", func(req Request, res Response) {
+    router.Get(func(req Request, res Response) {
         res.Send("Hello, World!")
     })
 
@@ -42,7 +42,7 @@ func main() {
 var pageRouter=ARouter()
 
 // Mount handler and midware
-pageRouter.Use("/", func(req Request, res Response) (bool, Request, Response) {
+pageRouter.Use(func(req Request, res Response) (bool, Request, Response) {
     fmt.Println(req.Path())
 	return true, req, res
 })
@@ -64,9 +64,10 @@ Creates and returns one default router for gateway. The mountpoint it is mounted
 #### `func ARouter() Router`
 Creates and returns one default router with `mountpoint="/"`.
 
-#### `func (Router)Use(mountpoint string, processor Tout) Router`
+#### `func (Router)Use([mountpoint string], processor Tout) Router`
 Mounts a mountable to the router at mountpoint. Mountpoint must start with `/`, regexp is currently unsupported. It will try to match the mountpoint by prefix.   
-Returns the router itself for method chaining.
+Returns the router itself for method chaining.  
+**NOTE: the first parameter could be omitted and will be set to "/" by default**
 
 Mountable includes the following items:
 
@@ -101,19 +102,19 @@ router.Use("/", func(req Request, res Response) {
 })
 ```
 
-#### `func (Router)Get(mountpoint string, processor Tout) Router`
+#### `func (Router)Get([mountpoint string,] processor Tout) Router`
 Similar to `Router.Use()` but differs in two points:
 
 - Mountpoint must match the whole word, not the prefix to trigger the rule.
 - Only GET method will trigger the rule.
 
-#### `func (Router)Post(mountpoint string, processor Tout) Router`
+#### `func (Router)Post([mountpoint string,] processor Tout) Router`
 Similar to `Router.Get()` but triggered by POST request.
 
-#### `func (Router)Put(mountpoint string, processor Tout) Router`
+#### `func (Router)Put([mountpoint string,] processor Tout) Router`
 Similar to `Router.Get()` but triggered by PUT request.
 
-#### `func (Router)Delete(mountpoint string, processor Tout) Router`
+#### `func (Router)Delete([mountpoint string,] processor Tout) Router`
 Similar to `Router.Get()` but triggered by DELETE request.
 
 #### `func (Router)UseSpecified(mountpoint string, method string, processor Tout, isStrict bool) Router`
