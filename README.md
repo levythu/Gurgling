@@ -133,6 +133,9 @@ It will set `Content-Type: text/plain; charset=utf-8`.
 #### `func (Response)Send(content string) error`
 Quick invocation for `Response.Status`, using code 200. Can only be invoked successfully without any preceding head-sending invoking.
 
+#### `func (Response)RedirectEX(newAddr string, code int) error`
+Redirect to newAddr by returning `code` as status code. Can only be invoked successfully without any preceding head-sending invoking.
+
 #### `func (Response)Redirect(newAddr string) error`
 Redirect to newAddr by returning 307 (Moved Temporarily). Can only be invoked successfully without any preceding head-sending invoking.
 
