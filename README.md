@@ -48,7 +48,7 @@ func main() {
     ARouter().Get(func(req Request, res Response) {
         res.Send("Hello, World!")
     }).Launch(":8080")
-    
+
 }
 ```
 
@@ -108,12 +108,20 @@ router.Use("/", func(req Request, res Response) (bool, Request, Response) {
 An interface which implement `Midware` function as `.Handler()`.  
 Since Router also implement the function, Router is a special IMidware. It will never pass request to the next.
 
+```go
+var anotherRouter=ARouter()
+router.Use("/", anotherRouter)
+```
+
 ##### **`Hopper`** (`type Midware func(Request, Response) bool`)  
 Simplified version of `Midware`. It will not modify original `res` and `req`.
 
 ```go
-var anotherRouter=ARouter()
-router.Use("/", anotherRouter)
+router.Use("/", func(req Request, res Response) bool {
+    fmt.Println(req.Path())
+	// Stop passing it.
+	return false
+})
 ```
 
 ##### **`Terminal`** (`type Terminal func(Request, Response)`)
