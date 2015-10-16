@@ -30,7 +30,25 @@ func main() {
 
     // Mount the gate to net/http and run the server
     fmt.Println("Running...")
-    LaunchServer(":8080", router)
+    router.Launch(":8080")
+}
+```
+
+### Or simply chain them
+
+```go
+package main
+
+import (
+    . "github.com/levythu/gurgling"
+)
+
+func main() {
+
+    ARouter().Get(func(req Request, res Response) {
+        res.Send("Hello, World!")
+    }).Launch(":8080")
+    
 }
 ```
 
@@ -63,6 +81,9 @@ Creates and returns one default router for gateway. The mountpoint it is mounted
 
 #### `func ARouter() Router`
 Creates and returns one default router with `mountpoint="/"`.
+
+#### `func (Router)Launch(addr string) error`
+Invoke `net/http` to launch the server at `addr`. This function is supposed to run forever unless an error is encountered.
 
 #### `func (Router)Use([mountpoint string], processor Tout) Router`
 Mounts a mountable to the router at mountpoint. Mountpoint must start with `/`, regexp is currently unsupported. It will try to match the mountpoint by prefix.   

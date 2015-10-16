@@ -19,6 +19,7 @@ type Router interface {
     UseSpecified(string, string/*=""*/, Tout, bool) Router
     ServeHTTP(http.ResponseWriter, *http.Request)
     Handler(Request, Response) (bool, Request, Response)
+    Launch(string) error
 }
 
 // The followings are mountable: =====================================================
@@ -255,4 +256,7 @@ func (this *router)Handler(req Request, res Response) (bool, Request, Response) 
 func (this *router)SetErrorHandler(proc RouterErrorCatcher) Router {
     this.catcher=proc
     return this
+}
+func (this *router)Launch(addr string) error {
+    return http.ListenAndServe(addr, this)
 }
