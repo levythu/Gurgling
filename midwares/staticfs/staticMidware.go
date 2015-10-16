@@ -91,9 +91,13 @@ func (this *FsMidware)Handler(req Request, res Response) (bool, Request, Respons
 // handle the cache and manage data transmission
 func (this *FsMidware)handleFile(req Request, res Response, filename string, fileinfo os.FileInfo) {
     const timeFormat="Mon, 02 Jan 2006 15:04:05 GMT"
-    assert(res.Set(HEADER_CACHE_CONTROL, this.CacheControl.String()))
+    if res.Set(HEADER_CACHE_CONTROL, this.CacheControl.String())!=nil {
+        return
+    }
     var currentModifytime=fileinfo.ModTime().UTC().Format(timeFormat)
-    assert(res.Set(HEADER_LAST_MODIFIED, currentModifytime))
+    if res.Set(HEADER_LAST_MODIFIED, currentModifytime)!=nil {
+        return
+    }
     /*
     var strategy=req.GetAll(HEADER_CACHE_CONTROL)
     if strategy!=nil {

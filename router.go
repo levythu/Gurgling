@@ -205,7 +205,7 @@ func (this *router)ServeHTTP(w http.ResponseWriter, r *http.Request) {
     this.Handler(req, res)
 }
 
-const content="<!DOCTYPE html><html><head><title>404 Not Found" +
+const content404="<!DOCTYPE html><html><head><title>404 Not Found" +
     "</title><style>h2 {text-align: center;}table {max-width: 35em;margin: 0 auto;padding-top: 1em;font: 1em Arial, Helvetica, sans-serif;}a {text-decoration: none;color: #0070C0;}p {text-align:right;padding-top: 0.6em;}div {position: absolute;width: 100%;left: 0;border-bottom: 1px solid #CCC;padding-top: 0.5em;}</style></head><body><h2>404 Not Found"+
     "</h2><table>"+
     "<tr><td><div></div><p>by <a href=\"https://github.com/levythu/gurgling\">Gurgling "+Version+"</a></p></td></tr></table></body></html>"
@@ -225,7 +225,7 @@ func (this *router)Handler(req Request, res Response) (bool, Request, Response) 
             // No any more match, return 404
             res.Set("Content-Type", "text/html; charset=utf-8")
             res.SendCode(404)
-            io.WriteString(res, content)
+            io.WriteString(res, content404)
             return false, nil, nil
         }
         var isContinue, newReq, newRes=(result.(Midware))(req, res)

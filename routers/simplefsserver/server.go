@@ -11,7 +11,7 @@ import (
 
 // An simple and naive application of midwares/staticfs, indexing directory and handling 404.
 // the rendered page will not be saved.
-func renderDeirectory(req Request, res Response, directory string) {
+func renderDirectory(req Request, res Response, directory string) {
     var fileList, err=ioutil.ReadDir(directory)
     if err!=nil {
         res.Status("Internal error while reading file", 500)
@@ -59,14 +59,14 @@ func notFound(req Request, res Response) {
 func ASimpleFSServer(basePath string) Router {
     var fs=staticfs.AStaticfs(basePath).(*staticfs.FsMidware)
     var ay=analyzer.ASimpleAnalyzer()
-    fs.DefaultRender=renderDeirectory
+    fs.DefaultRender=renderDirectory
 
     return ARouter().Use(ay).Use(fs)
 }
 func NewSimpleFSServer(basePath string, cacheStrategy staticfs.CacheStrategy, autoIndexing bool) Router {
     var fs=staticfs.AStaticfs(basePath).(*staticfs.FsMidware)
     if autoIndexing {
-        fs.DefaultRender=renderDeirectory
+        fs.DefaultRender=renderDirectory
     }
     var ay=analyzer.ASimpleAnalyzer()
     fs.CacheControl=cacheStrategy
