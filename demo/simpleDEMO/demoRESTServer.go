@@ -15,11 +15,10 @@ func main() {
     router.Use(staticfs.AStaticfs("public/"))
     router.Get(func(req Request, res Response) {
         res.Send("This is index.")
-    })
-    router.Use("/page", page)
+    }).Use("/page", page)
 
     fmt.Println("Running...")
-    LaunchServer(":8192", router)
+    router.Launch(":8192")
 }
 /*
 func main() {
