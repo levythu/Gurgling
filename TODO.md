@@ -9,3 +9,4 @@
 [x] exp on infinite loop - loop forever
 [x] add panic capture
 [x] add a simple form of midware
+[ ] Add default 404 handler

@@ -113,7 +113,7 @@ var anotherRouter=ARouter()
 router.Use("/", anotherRouter)
 ```
 
-##### **`Hopper`** (`type Midware func(Request, Response) bool`)  
+##### **`Hopper`** (`type Hopper func(Request, Response) bool`)  
 Simplified version of `Midware`. It will not modify original `res` and `req`.
 
 ```go
