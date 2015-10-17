@@ -7,5 +7,5 @@
 [x] Add sandwich
 [x] Add logger
 [x] exp on infinite loop - loop forever
-[ ] add panic capture
+[x] add panic capture
 [x] add a simple form of midware
