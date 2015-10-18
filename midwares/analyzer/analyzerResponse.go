@@ -62,10 +62,18 @@ func (this *logResponse)SendCode(c int) error {
     return err
 }
 func (this *logResponse)Redirect(d string) error {
-    return this.o.Redirect(d)
+    var err=this.o.Redirect(d)
+    if err==nil || err==SENT_BUT_ABORT {
+        this.OnHeadSent(this.o, 307)
+    }
+    return err
 }
 func (this *logResponse)RedirectEX(d string, c int) error {
-    return this.o.RedirectEX(d, c)
+    var err=this.o.RedirectEX(d, c)
+    if err==nil || err==SENT_BUT_ABORT {
+        this.OnHeadSent(this.o, c)
+    }
+    return err
 }
 func (this *logResponse)R() http.ResponseWriter {
     return this.o.R()

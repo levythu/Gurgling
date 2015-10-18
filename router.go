@@ -4,7 +4,6 @@ import (
     "net/http"
     "github.com/levythu/gurgling/matcher"
     . "github.com/levythu/gurgling/definition"
-    "io"
 )
 
 // Indeed an interface.
@@ -15,6 +14,7 @@ type Router interface {
     Put(paraList ...interface{}) Router
     Delete(paraList ...interface{}) Router
     SetErrorHandler(RouterErrorCatcher) Router
+    Set404Handler(Terminal) Router
     Last(Cattail) Router
     UseSpecified(string, string/*=""*/, Tout, bool) Router
     ServeHTTP(http.ResponseWriter, *http.Request)
@@ -56,6 +56,8 @@ type router struct {
     tailList []Cattail
     // if nil, do not catch error
     catcher RouterErrorCatcher
+    // if nil, return a default info.
+    h404 Terminal
 }
 
 // The error will be fatal.
@@ -69,6 +71,7 @@ func GetRouter(MountPoint string) Router {
         mat: matcher.NewBFMatcher(),
         tailList: []Cattail{},
         catcher: DefaultCacher,
+        h404: Default404Cacher,
     }
 }
 
@@ -81,6 +84,7 @@ func ARouter() Router {
         mat: matcher.NewBFMatcher(),
         tailList: []Cattail{},
         catcher: DefaultCacher,
+        h404: Default404Cacher,
     }
 }
 
@@ -212,10 +216,6 @@ func (this *router)ServeHTTP(w http.ResponseWriter, r *http.Request) {
     this.Handler(req, res)
 }
 
-const content404="<!DOCTYPE html><html><head><title>404 Not Found" +
-    "</title><style>h2 {text-align: center;}table {max-width: 35em;margin: 0 auto;padding-top: 1em;font: 1em Arial, Helvetica, sans-serif;}a {text-decoration: none;color: #0070C0;}p {text-align:right;padding-top: 0.6em;}div {position: absolute;width: 100%;left: 0;border-bottom: 1px solid #CCC;padding-top: 0.5em;}</style></head><body><h2>404 Not Found"+
-    "</h2><table>"+
-    "<tr><td><div></div><p>by <a href=\"https://github.com/levythu/gurgling\">Gurgling "+Version+"</a></p></td></tr></table></body></html>"
 func (this *router)Handler(req Request, res Response) (bool, Request, Response) {
     defer func() {
         if this.catcher!=nil {
@@ -236,9 +236,11 @@ func (this *router)Handler(req Request, res Response) (bool, Request, Response) 
         result, workstatus=this.mat.Match(req.p2Path(), req.p2BaseUrl(), req.F(), req.Method(), workstatus)
         if result==nil {
             // No any more match, return 404
-            res.Set("Content-Type", "text/html; charset=utf-8")
-            res.SendCode(404)
-            io.WriteString(res, content404)
+            if (this.h404!=nil) {
+                this.h404(req, res)
+            } else {
+                res.Status("404 Not Found", 404)
+            }
             return false, nil, nil
         }
         var isContinue, newReq, newRes=(result.(Midware))(req, res)
@@ -255,6 +257,10 @@ func (this *router)Handler(req Request, res Response) (bool, Request, Response) 
 }
 func (this *router)SetErrorHandler(proc RouterErrorCatcher) Router {
     this.catcher=proc
+    return this
+}
+func (this *router)Set404Handler(proc Terminal) Router {
+    this.h404=proc
     return this
 }
 func (this *router)Launch(addr string) error {
