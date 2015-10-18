@@ -18,7 +18,7 @@ type BruteforceMatcher struct {
     rules []*ruleRecord
 }
 
-func NewBFMatcher() Matcher {
+func ABFMatcher() Matcher {
     return &BruteforceMatcher {
         rules: []*ruleRecord{},
     }

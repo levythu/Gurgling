@@ -11,7 +11,7 @@ func assert(t *testing.T, cond bool) {
 }
 
 func TestRules(t *testing.T) {
-    var bfmatcher=NewBFMatcher()
+    var bfmatcher=ABFMatcher()
     assert(t, bfmatcher.AddRule("/huahua/post/", "POST", 99, false)==true)
     assert(t, bfmatcher.AddRule("/huahua", "", 1, false)==true)
     assert(t, bfmatcher.AddRule("qq", "",2, false)==false)
