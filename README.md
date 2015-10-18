@@ -78,7 +78,6 @@ package main
 import (
     "fmt"
     . "github.com/levythu/gurgling"
-    "github.com/levythu/gurgling/matcher"
 )
 
 func main() {
