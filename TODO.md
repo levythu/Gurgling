@@ -11,4 +11,4 @@
 [x] add a simple form of midware
 [x] Add default 404 handler
 [x] Record redirect
-[ ] support for regexp
+[x] support for regexp
