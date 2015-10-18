@@ -70,7 +70,7 @@ func (this *RegexpMatcher)AddRule(rulePattern string, methodPattern string, stor
     })
     return true
 }
-const REGEXP_MATCHER_RESULT="regexp-matcher-result"
+const REGEXP_RESULT="RR"
 func (this *RegexpMatcher)Match(path *string, baseUrl *string, reqF map[string]Tout, method string/*=""*/, prevPoint Tout) (Tout, Tout) {
     var startpoint int
     if prevPoint==nil {
@@ -86,7 +86,7 @@ func (this *RegexpMatcher)Match(path *string, baseUrl *string, reqF map[string]T
             // Matched!
             *path=strings.TrimPrefix(*path, res[0])
             *baseUrl=*baseUrl+res[0]
-            reqF[REGEXP_MATCHER_RESULT]=res
+            reqF[REGEXP_RESULT]=res
             return this.rules[startpoint].storage, startpoint+1
         }
         startpoint++

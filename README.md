@@ -1,6 +1,8 @@
 # Gurgling
 An extremely-light framework for Golang to build restful API and Website.
 
+**0.3.0 NEWS! REGULAR EXPRESSION ARE SUPPORTED NOW!**
+
 **Special Thanks to [Express](http://expressjs.com/), which provides API samples for this project.**
 
 ## Quick Start
@@ -68,6 +70,32 @@ pageRouter.Get("/editor", func(req Request, res Response) {
 
 // Mount the router to the previous one
 router.Use("/page", pageRouter)
+```
+### Want some regular expressions? Here they are!
+```go
+package main
+
+import (
+    "fmt"
+    . "github.com/levythu/gurgling"
+    "github.com/levythu/gurgling/matcher"
+)
+
+func main() {
+    var router=ARegexpRouter()
+
+    router.Get(`/(\d+)`, func(req Request, res Response) {
+        // the submatches are stored in req.F()["RR"] as []string
+        var matchResult=req.F()["RR"].([]string)
+        res.Send("The digits are "+matchResult[1])
+    })
+    router.Get(`/.*` ,func(req Request, res Response) {
+        res.Send("Please visit paths consisting of digits.")
+    })
+
+    fmt.Println("Running...")
+    router.Launch(":8192")
+}
 ```
 
 ## API Docs
