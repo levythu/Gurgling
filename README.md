@@ -78,10 +78,10 @@ The core module of gurgling. It is indeed an interface, and is implemented by `r
 Creates and returns one default router for gateway. The mountpoint it is mounted to in `http.Handle()` function should be specified here.
 
 #### `func ARouter() Router`
-Creates and returns one default router with `mountpoint="/"`.
+Creates and returns one default router with `mountpoint="/"`, which is the default mountpoint for `Router.Launch()`
 
 #### `func (Router)Launch(addr string) error`
-Invoke `net/http` to launch the server at `addr`. This function is supposed to run forever unless an error is encountered.
+Invokes `net/http` to launch the server at `addr`. This function is supposed to keep running unless an error is encountered.
 
 #### `func (Router)Use([mountpoint string], processor Tout) Router`
 Mounts a mountable to the router at mountpoint. Mountpoint must start with `/`, regexp is currently unsupported. It will try to match the mountpoint by prefix.   
@@ -92,7 +92,7 @@ Mountable includes the following items:
 
 ##### **`Midware`** (`type Midware func(Request, Response) (bool, Request, Response)`)  
 A function, receiving `Request` and `Response` as parameter.  
-Returns three value, two of which are modified res&req (if no modification just return the original) and the boolean indicates whether to pass the request to the next handler (`false` for no).
+Returns three value, two of which are modified res&req (if no modification just return the original, or use `Hopper`) and the boolean indicates whether to pass the request to the next handler (`false` for not).
 
 ```go
 router.Use("/", func(req Request, res Response) (bool, Request, Response) {
@@ -104,7 +104,7 @@ router.Use("/", func(req Request, res Response) (bool, Request, Response) {
 
 ##### **`IMidware`**  
 An interface which implement `Midware` function as `.Handler()`.  
-Since Router also implement the function, Router is a special IMidware. It will never pass request to the next.
+Since `Router` also implement the function, `Router` is a special IMidware, which never passes request to the next.
 
 ```go
 var anotherRouter=ARouter()
@@ -124,7 +124,7 @@ router.Use("/", func(req Request, res Response) bool {
 
 ##### **`Terminal`** (`type Terminal func(Request, Response)`)
 A function, receiving `Request` and `Response` as parameter.  
-It is a short form of Midware and will never pass request. So it does not have return value and quiet easy to code.
+It is a simplified form of Midware and will never pass request. So it does not have return value and quite easy to code.
 
 ```go
 router.Use("/", func(req Request, res Response) {
@@ -134,13 +134,13 @@ router.Use("/", func(req Request, res Response) {
 
 #### `func (Router)Last(processor Cattail) Router`
 Mount a cattail to the end of the router.  
-`type Cattail func(Request, Response)` is a function that will always get executed after the request is handled by normal routers and midwares. In such circumstance, the response header is certainly to be sent. So providing `Response` is useless. However, it is still provided for appending data, although not recommended.  
-Like `Router.Use()`, all the Cattail will get executed in the order they are mounted in codes.
+`type Cattail func(Request, Response)` is a function that will always get executed after the request is handled by normal routers and midwares. In such circumstance, the response header is certainly to be sent. So most methods of `Response` are invalid. However, it is still provided for appending data, although not recommended.  
+Like `Router.Use()`, all the Cattails will get executed in the order they are mounted in codes.
 
 #### `func (Router)Get([mountpoint string,] processor Tout) Router`
 Similar to `Router.Use()` but differs in two points:
 
-- Mountpoint must match the whole word, not the prefix to trigger the rule.
+- Mountpoint must match the whole path, not the prefix to trigger the rule.
 - Only GET method will trigger the rule.
 
 #### `func (Router)Post([mountpoint string,] processor Tout) Router`
@@ -156,14 +156,14 @@ Similar to `Router.Get()` but triggered by DELETE request.
 General version of `Router.Use()`/`Router.Get()`/`Router.Put()`/`Router.Delete()`/`Router.Post()`.  
 
 - `method` specifies the trigger method. Empty string means WILDCARD.  
-- `isStrict` indicates whether the match is performed strictly.
+- `isStrict` indicates whether the match is performed strictly. (Matches whole path or prefix)
 
 #### `func (Router)SetErrorHandler(handler RouterErrorCatcher) Router`
-Set the runtime error handler to recover from panic. The handler is `func(Request, Response, interface{})`, the third parameter of which is the panic content. Note that if there is any panic in the handler, the whole program will suffer from it, too.  
-The default handler is tp render a `500 Internal Error` page to client. If set to nil, the router will not recover from panic and it is good for debugging.
+Set the runtime error handler to recover from panic. The handler is `func(Request, Response, interface{})`, the third parameter of which is the panic content. Note that if there is any panic in the handler, the whole program will not avoid suffering.  
+The default handler is to render a `500 Internal Error` page to client. If set to `nil`, the router will not recover from panic, thus printing panic stack in error log, which is good for debugging.
 
 #### `func (Router)Set404Handler(handler Terminal) Router`
-Set the 404 handler. When no rules matches the request, the handler will get executed. If set to nil, the server will return a string "404 NOT FOUND" by default.
+Set the 404 handler. When no rules matches the request, the handler will get executed. If set to `nil`, the server will return a string "404 NOT FOUND" by default.
 
 ### Response
 The interface provided in Handler callback wrapping functions for quick response, in Express format. Since it is an interface, further hack by midwares is possible.
@@ -188,7 +188,7 @@ Sending the code without any body content. Can only be invoked successfully with
 #### `func (Response)SendFileEx(filepath string, mime string, encoder encoding.Encoder, code int) error`
 Sending a local file with content encoding specified by `encoder`, http status code `code` and MIME type `mime`.
 
-- `filepath`: the relative file path for the file to be sent.
+- `filepath`: the path for the file to be sent.
 - `mime`: if left empty, gurgling will try to infer it according to file extension.
 - `encoder`: if nil, a default encoder will be used, which sends the data as they are. For more encoders refer to `github.com/levythu/gurgling/encoding`
 - `code`: http status code.
