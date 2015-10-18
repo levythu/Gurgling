@@ -44,11 +44,9 @@ import (
 )
 
 func main() {
-
-    ARouter().Get(func(req Request, res Response) {
-        res.Send("Hello, World!")
-    }).Launch(":8080")
-
+    ARouter( ).Get(func(req Request, res Response) {
+                res.Send("Hello, World!")
+            }).Launch(":8080")
 }
 ```
 
