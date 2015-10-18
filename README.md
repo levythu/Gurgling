@@ -1,4 +1,4 @@
-# Gurgling
+# Gurgling 0.3.0
 An extremely-light framework for Golang to build restful API and Website.
 
 **0.3.0 NEWS! REGULAR EXPRESSION IS SUPPORTED NOW!**
@@ -104,13 +104,13 @@ The core module of gurgling. It is indeed an interface, and is implemented by `r
 
 #### `func GetRouter(MountPoint string, matchHandler matcher.Matcher) Router`
 Creates and returns one default router for gateway. The mountpoint it is mounted to in `http.Handle()` function should be specified here.  
-The matcher needs to be specified. It could be either BFMatcher or RegexpMatcher.
+The matcher needs to be specified. It could be either `BFMatcher` or `RegexpMatcher`.
 
 #### `func ARouter() Router`
 Creates and returns one default router with `mountpoint="/"`, which is the default mountpoint for `Router.Launch()`
 
 #### `func ARegexpRouter() Router`
-Creates and returns one default router with `mountpoint="/"`. It differs from `ARouter` in that its returned router support regexp rule. Of course, this leads to a bit longer to match. Thus, for non-regexp use, create router with `ARouter()` instead.
+Creates and returns one default router with `mountpoint="/"`. It differs from `ARouter` in that its returned router supports regexp rule. Of course, this leads to longer time to match. Thus, for non-regexp use, create router with `ARouter()` instead.
 
 #### `func (Router)Launch(addr string) error`
 Invokes `net/http` to launch the server at `addr`. This function is supposed to keep running unless an error is encountered.
