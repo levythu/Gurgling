@@ -1,7 +1,7 @@
 # Gurgling
 An extremely-light framework for Golang to build restful API and Website.
 
-**0.3.0 NEWS! REGULAR EXPRESSION ARE SUPPORTED NOW!**
+**0.3.0 NEWS! REGULAR EXPRESSION IS SUPPORTED NOW!**
 
 **Special Thanks to [Express](http://expressjs.com/), which provides API samples for this project.**
 
