@@ -5,7 +5,7 @@ An extremely-light framework for Golang to build restful API and Website.
 
 ## Quick Start
 
-### Install
+### Install it
 
 ```sh
 go get github.com/levythu/gurgling
@@ -28,7 +28,7 @@ func main() {
         res.Send("Hello, World!")
     })
 
-    // Mount the gate to net/http and run the server
+    // Launch the server
     fmt.Println("Running...")
     router.Launch(":8080")
 }
@@ -44,15 +44,13 @@ import (
 )
 
 func main() {
-
-    ARouter().Get(func(req Request, res Response) {
-        res.Send("Hello, World!")
-    }).Launch(":8080")
-    
+    ARouter( ).Get(func(req Request, res Response) {
+                res.Send("Hello, World!")
+            }).Launch(":8080")
 }
 ```
 
-### Create sub-routers and mount them
+### Then, create sub-routers and mount them
 
 ```go
 
@@ -60,9 +58,9 @@ func main() {
 var pageRouter=ARouter()
 
 // Mount handler and midware
-pageRouter.Use(func(req Request, res Response) (bool, Request, Response) {
+pageRouter.Use(func(req Request, res Response) bool {
     fmt.Println(req.Path())
-	return true, req, res
+	return true
 })
 pageRouter.Get("/editor", func(req Request, res Response) {
     res.Send("Here's the editor.")
@@ -108,12 +106,20 @@ router.Use("/", func(req Request, res Response) (bool, Request, Response) {
 An interface which implement `Midware` function as `.Handler()`.  
 Since Router also implement the function, Router is a special IMidware. It will never pass request to the next.
 
-##### **`Hopper`** (`type Midware func(Request, Response) bool`)  
-Simplified version of `Midware`. It will not modify original `res` and `req`.
-
 ```go
 var anotherRouter=ARouter()
 router.Use("/", anotherRouter)
+```
+
+##### **`Hopper`** (`type Hopper func(Request, Response) bool`)  
+Simplified version of `Midware`. It will not modify original `res` and `req`.
+
+```go
+router.Use("/", func(req Request, res Response) bool {
+    fmt.Println(req.Path())
+	// Stop passing it.
+	return false
+})
 ```
 
 ##### **`Terminal`** (`type Terminal func(Request, Response)`)
@@ -155,6 +161,9 @@ General version of `Router.Use()`/`Router.Get()`/`Router.Put()`/`Router.Delete()
 #### `func (Router)SetErrorHandler(handler RouterErrorCatcher) Router`
 Set the runtime error handler to recover from panic. The handler is `func(Request, Response, interface{})`, the third parameter of which is the panic content. Note that if there is any panic in the handler, the whole program will suffer from it, too.  
 The default handler is tp render a `500 Internal Error` page to client. If set to nil, the router will not recover from panic and it is good for debugging.
+
+#### `func (Router)Set404Handler(handler Terminal) Router`
+Set the 404 handler. When no rules matches the request, the handler will get executed. If set to nil, the server will return a string "404 NOT FOUND" by default.
 
 ### Response
 The interface provided in Handler callback wrapping functions for quick response, in Express format. Since it is an interface, further hack by midwares is possible.

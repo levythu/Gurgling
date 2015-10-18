@@ -9,6 +9,6 @@ import (
 func main() {
     var router=simplefsserver.ASimpleFSServer("public/")
 
-    fmt.Println("Running...")
+    fmt.Println("Running on port 8192...")
     LaunchServer(":8192", router)
 }
