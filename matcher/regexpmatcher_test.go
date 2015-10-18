@@ -6,7 +6,7 @@ import (
 )
 
 func TestRegEXPRules(t *testing.T) {
-    var regmatcher=NewRegexpMatcher()
+    var regmatcher=ARegexpMatcher()
     assert(t, regmatcher.AddRule("/huahua/post/", "POST", 99, false)==true)
     assert(t, regmatcher.AddRule("/huahua", "", 1, false)==true)
     assert(t, regmatcher.AddRule("qq", "",2, false)==false)

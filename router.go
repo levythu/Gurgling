@@ -61,14 +61,14 @@ type router struct {
 }
 
 // The error will be fatal.
-func GetRouter(MountPoint string) Router {
+func GetRouter(MountPoint string, matchHandler matcher.Matcher) Router {
     if !checkMountpointValidity(&MountPoint) {
         panic(INVALID_MOUNT_POINT)
     }
     return &router {
         mountMap: make(map[string]*router),
         initMountPoint: MountPoint,
-        mat: matcher.NewBFMatcher(),
+        mat: matchHandler,
         tailList: []Cattail{},
         catcher: DefaultCacher,
         h404: Default404Cacher,
@@ -81,7 +81,18 @@ func ARouter() Router {
     return &router {
         mountMap: make(map[string]*router),
         initMountPoint: "",
-        mat: matcher.NewBFMatcher(),
+        mat: matcher.ABFMatcher(),
+        tailList: []Cattail{},
+        catcher: DefaultCacher,
+        h404: Default404Cacher,
+    }
+}
+
+func ARegexpRouter() Router {
+    return &router {
+        mountMap: make(map[string]*router),
+        initMountPoint: "",
+        mat: matcher.ARegexpMatcher(),
         tailList: []Cattail{},
         catcher: DefaultCacher,
         h404: Default404Cacher,

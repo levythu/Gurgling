@@ -18,7 +18,7 @@ type RegexpMatcher struct {
     rules []*regexpRecord
 }
 
-func NewRegexpMatcher() Matcher {
+func ARegexpMatcher() Matcher {
     return &RegexpMatcher {
         rules: []*regexpRecord{},
     }

@@ -74,17 +74,21 @@ router.Use("/page", pageRouter)
 ### Router
 The core module of gurgling. It is indeed an interface, and is implemented by `router`, its default and original version. The interface is designed for extensions.
 
-#### `func GetRouter(MountPoint string) Router`
-Creates and returns one default router for gateway. The mountpoint it is mounted to in `http.Handle()` function should be specified here.
+#### `func GetRouter(MountPoint string, matchHandler matcher.Matcher) Router`
+Creates and returns one default router for gateway. The mountpoint it is mounted to in `http.Handle()` function should be specified here.  
+The matcher needs to be specified. It could be either BFMatcher or RegexpMatcher.
 
 #### `func ARouter() Router`
 Creates and returns one default router with `mountpoint="/"`, which is the default mountpoint for `Router.Launch()`
+
+#### `func ARegexpRouter() Router`
+Creates and returns one default router with `mountpoint="/"`. It differs from `ARouter` in that its returned router support regexp rule. Of course, this leads to a bit longer to match. Thus, for non-regexp use, create router with `ARouter()` instead.
 
 #### `func (Router)Launch(addr string) error`
 Invokes `net/http` to launch the server at `addr`. This function is supposed to keep running unless an error is encountered.
 
 #### `func (Router)Use([mountpoint string], processor Tout) Router`
-Mounts a mountable to the router at mountpoint. Mountpoint must start with `/`, regexp is currently unsupported. It will try to match the mountpoint by prefix.   
+Mounts a mountable to the router at mountpoint. Mountpoint must start with `/`. Create a router with matcher `RegexpMatcher` could make regexp supported, but **DO NOT** use first-char or last-char matcher (`^` or `$`). It will try to match the mountpoint by prefix.   
 Returns the router itself for method chaining.  
 **NOTE: the first parameter could be omitted and will be set to "/" by default**
 
