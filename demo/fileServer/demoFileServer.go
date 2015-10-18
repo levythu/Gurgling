@@ -7,8 +7,9 @@ import (
 )
 
 func main() {
-    var router=simplefsserver.ASimpleFSServer("public/")
+    // Use the directory of the program as root directory to the public
+    var router Router=simplefsserver.ASimpleFSServer(".")
 
     fmt.Println("Running on port 8192...")
-    LaunchServer(":8192", router)
+    router.Launch(":8192")
 }
