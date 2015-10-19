@@ -70,7 +70,7 @@ func GetRouter(MountPoint string, matchHandler matcher.Matcher) Router {
         initMountPoint: MountPoint,
         mat: matchHandler,
         tailList: []Cattail{},
-        catcher: DefaultCacher,
+        catcher: nil,
         h404: Default404Cacher,
     }
 }
@@ -83,7 +83,7 @@ func ARouter() Router {
         initMountPoint: "",
         mat: matcher.ABFMatcher(),
         tailList: []Cattail{},
-        catcher: DefaultCacher,
+        catcher: nil,
         h404: Default404Cacher,
     }
 }
