@@ -6,7 +6,6 @@ import (
     "strings"
     "encoding/json"
     "io/ioutil"
-    "fmt"
 )
 
 // Force to fetch data and store it in req.F["body"]
@@ -49,7 +48,6 @@ func (this *BodyParser)Handler(req Request, res Response) (isCont bool, nReq Req
     }
 
     var contentType=strings.ToLower(parseContentType(req.Get(CONTENT_TYPE_KEY)))
-    fmt.Println(contentType)
     if contentType=="application/x-www-form-urlencoded" {
         // Parse it as key-value.
         // in the case the body is url.Values
