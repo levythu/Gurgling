@@ -96,7 +96,7 @@ func (this *OriRequest)Query() map[string]string {
     return this.parsedQuery
 }
 func (this *OriRequest)Body() Tout {
-    return this.r.Body
+    return this.F()["body"]
 }
 func (this *OriRequest)Method() string {
     return strings.ToUpper(this.r.Method)
