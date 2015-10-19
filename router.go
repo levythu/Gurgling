@@ -128,7 +128,7 @@ func (this *router)Post(paraList ...interface{}) Router {
     var mountpoint string
     var processor Tout
     mountpoint, processor=extractParameters(paraList...)
-    return this.UseSpecified(mountpoint, "GET", processor, true)
+    return this.UseSpecified(mountpoint, "POST", processor, true)
 }
 
 // a POST specified version for use

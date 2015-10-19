@@ -88,7 +88,7 @@ func main() {
         var matchResult=req.F()["RR"].([]string)
         res.Send("The digits are "+matchResult[1])
     })
-    router.Get(`/.*` ,func(req Request, res Response) {
+    router.Get(`/.*`, func(req Request, res Response) {
         res.Send("Please visit paths consisting of digits.")
     })
 

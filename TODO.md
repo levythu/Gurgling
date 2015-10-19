@@ -12,3 +12,5 @@
 [x] Add default 404 handler
 [x] Record redirect
 [x] support for regexp
+[ ] use nil as default catcher
+[ ] Add body parse
