@@ -51,5 +51,10 @@ func (this *SimpleAnalyzer)Final(req Request, res Response) {
     }
 
     var url=req.R().URL
-    fmt.Println("- "+timeElpase+"\t\t"+codeStr+"\t"+req.Method()+"\t"+url.Path+"?"+url.RawQuery)
+    fmt.Print("- "+timeElpase+"\t\t"+codeStr+"\t"+req.Method()+"\t"+url.Path)
+    if url.RawQuery!="" {
+        fmt.Println("?"+url.RawQuery)
+    } else {
+        fmt.Println("")
+    }
 }

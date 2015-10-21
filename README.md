@@ -191,7 +191,7 @@ General version of `Router.Use()`/`Router.Get()`/`Router.Put()`/`Router.Delete()
 
 #### `func (Router)SetErrorHandler(handler RouterErrorCatcher) Router`
 Set the runtime error handler to recover from panic. The handler is `func(Request, Response, interface{})`, the third parameter of which is the panic content. Note that if there is any panic in the handler, the whole program will not avoid suffering.  
-The default handler is to render a `500 Internal Error` page to client. If set to `nil`, the router will not recover from panic, thus printing panic stack in error log, which is good for debugging.
+The default handler is `nil`, which will not recover from panic, thus good for debugging. However, it is recommended to use `DefaultCacher` for the root router, which is to render a `500 Internal Error` page to client.
 
 #### `func (Router)Set404Handler(handler Terminal) Router`
 Set the 404 handler. When no rules matches the request, the handler will get executed. If set to `nil`, the server will return a string "404 NOT FOUND" by default.
