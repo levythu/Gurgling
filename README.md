@@ -71,7 +71,7 @@ pageRouter.Get("/editor", func(req Request, res Response) {
 // Mount the router to the previous one
 router.Use("/page", pageRouter)
 ```
-### Want some regular expressions? Here they are!
+### Want some regular expressions? Here you are!
 ```go
 package main
 
