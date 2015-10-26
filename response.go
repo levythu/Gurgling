@@ -163,6 +163,7 @@ func (this *OriResponse)JSONEx(obj interface{}, code int) error {
     }
 
     this.haveSent=true
+    this.r.Header().Set("Content-Type", "application/json; charset=utf-8")
     this.r.WriteHeader(code)
     _, err=this.r.Write(result)
     return err
