@@ -14,3 +14,5 @@
 [x] support for regexp
 [x] use nil as default catcher
 [x] Add body parser
+[ ] Add cookie handler
+[ ] Modify AXX constructor to a more friendly parameter-passing form

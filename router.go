@@ -70,8 +70,8 @@ func GetRouter(MountPoint string, matchHandler matcher.Matcher) Router {
         initMountPoint: MountPoint,
         mat: matchHandler,
         tailList: []Cattail{},
-        catcher: nil,
-        h404: Default404Cacher,
+        catcher: CGurgling.H500,
+        h404: CGurgling.H404,
     }
 }
 
@@ -83,8 +83,8 @@ func ARouter() Router {
         initMountPoint: "",
         mat: matcher.ABFMatcher(),
         tailList: []Cattail{},
-        catcher: nil,
-        h404: Default404Cacher,
+        catcher: CGurgling.H500,
+        h404: CGurgling.H404,
     }
 }
 
@@ -94,8 +94,8 @@ func ARegexpRouter() Router {
         initMountPoint: "",
         mat: matcher.ARegexpMatcher(),
         tailList: []Cattail{},
-        catcher: DefaultCacher,
-        h404: Default404Cacher,
+        catcher: CGurgling.H500,
+        h404: CGurgling.H404,
     }
 }
 
