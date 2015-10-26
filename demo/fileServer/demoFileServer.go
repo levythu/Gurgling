@@ -9,6 +9,8 @@ import (
 
 func main() {
     // Use the directory of the program as root directory to the public
+    SetPreCGurgling(CGurgling_Predefined_forRelease)
+
     var router Router=simplefsserver.ASimpleFSServer("public").Use(bodyparser.ABodyParser()).Post(func(req Request, res Response){
         fmt.Println(req.Body())
     })
