@@ -200,7 +200,7 @@ Set the 404 handler. When no rules matches the request, the handler will get exe
 The interface provided in Handler callback wrapping functions for quick response, in Express format. Since it is an interface, further hack by midwares is possible.
 
 #### `func (Response)Status(content string, code int) error`
-Quick send a message and specify the return code. Note that if any head-sending operation like `Response.Status`, `Response.Send`, `Response.SendFile`, `Response.SendFileEx`, `Rsponse.SendCode`, `Response.Write`, `Response.Redirect` has been invoked before, this one will fail and returns `RES_HEAD_ALREADY_SENT`.
+Quick send a message and specify the return code. Note that if any head-sending operation like `Response.Status`, `Response.Send`, `Response.SendFile`, `Response.SendFileEx`, `Rsponse.SendCode`, `Response.Write`, `Response.Redirect`, `Response.JSON`, `Response.JSONEx` has been invoked before, this one will fail and returns `RES_HEAD_ALREADY_SENT`.
 
 It will set `Content-Type: text/plain; charset=utf-8`.
 
@@ -212,6 +212,12 @@ Redirect to newAddr by returning `code` as status code. Can only be invoked succ
 
 #### `func (Response)Redirect(newAddr string) error`
 Redirect to newAddr by returning 307 (Moved Temporarily). Can only be invoked successfully without any preceding head-sending invoking.
+
+#### `func (Response)JSON(obj interface{}) error`
+Stringify the obj and send it with status code 200. Can only be invoked successfully without any preceding head-sending invoking.
+
+#### `func (Response)JSONEx(obj interface{}, code int) error`
+Stringify the obj and send it with status code `code`. Can only be invoked successfully without any preceding head-sending invoking.
 
 #### `func (Response)SendCode(code int) error`
 Sending the code without any body content. Can only be invoked successfully without any preceding head-sending invoking.
