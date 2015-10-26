@@ -9,8 +9,10 @@ import (
     fp "path/filepath"
     MIME "mime"
     "os"
+    "encoding/json"
 )
 
+// Depended by: gurgling/midwares/analyzer
 type Response interface {
     // Quick send with code 200. While done, any other operation except Write is not allowed anymore.
     // However, due to the framework of net/http, the response will not be closed until
@@ -42,6 +44,10 @@ type Response interface {
     // While done, any other operation except Write is not allowed anymore.
     Redirect(string) error
     RedirectEX(string, int) error
+
+    // While done, any other operation except Write is not allowed anymore.
+    JSON(interface{}) error
+    JSONEx(interface{}, int) error
 
     // get the Original resonse, only use it for advanced purpose
     R() http.ResponseWriter
@@ -144,6 +150,27 @@ func (this *OriResponse)RedirectEX(newAddr string, code int) error {
 func (this *OriResponse)Redirect(newAddr string) error {
     return this.RedirectEX(newAddr, 307)
 }
+func (this *OriResponse)JSONEx(obj interface{}, code int) error {
+    this.lock.Lock()
+    defer this.lock.Unlock()
+    if (this.haveSent) {
+        return RES_HEAD_ALREADY_SENT
+    }
+
+    var result, err=json.Marshal(obj)
+    if err!=nil {
+        return JSON_STRINGIFY_ERROR
+    }
+
+    this.haveSent=true
+    this.r.WriteHeader(code)
+    _, err=this.r.Write(result)
+    return err
+}
+func (this *OriResponse)JSON(obj interface{}) error {
+    return this.JSONEx(obj, 200)
+}
+
 func (this *OriResponse)SendFile(filepath string) error {
     return this.SendFileEx(filepath, "", encoding.GZipEncoder, 200)
 }

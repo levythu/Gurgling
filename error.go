@@ -9,6 +9,7 @@ var (
     RES_HEAD_ALREADY_SENT=errors.New("The response header has been sent.")
     SENDFILE_ENCODER_NOT_READY=errors.New("Encoder fails to create IO.")
     SENDFILE_FILEPATH_ERROR=errors.New("File path error.")
+    JSON_STRINGIFY_ERROR=errors.New("Error while stringifying json.")
     SENT_BUT_ABORT=errors.New("Aborted due to error.")
 
     // Router errors:
