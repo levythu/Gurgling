@@ -25,6 +25,12 @@ func SetPreCGurgling(obj *Gurgling_Config) {
         CGurgling.F[k]=v
     }
 }
+func SetGEnv(theme string) {
+    if v, ok:=_CGurgling_Predefined_map[theme];ok {
+        SetPreCGurgling(v)
+    }
+}
+
 func initPreCGurgling(obj *Gurgling_Config) Gurgling_Config {
     var ret Gurgling_Config
 
@@ -50,5 +56,10 @@ var (
         F: map[string]Tout{},
         H500: DefaultCacher,
         H404: Default404Cacher,
+    }
+
+    _CGurgling_Predefined_map=map[string]*Gurgling_Config {
+        "debug":    CGurgling_Predefined_forDebug,
+        "release":  CGurgling_Predefined_forRelease,
     }
 )
