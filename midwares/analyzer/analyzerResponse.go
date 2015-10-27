@@ -81,3 +81,17 @@ func (this *logResponse)R() http.ResponseWriter {
 func (this *logResponse)F() map[string]Tout {
     return this.o.F()
 }
+func (this *logResponse)JSON(obj interface{}) error {
+    var err=this.o.JSON(obj)
+    if err==nil || err==SENT_BUT_ABORT {
+        this.OnHeadSent(this.o, 200)
+    }
+    return err
+}
+func (this *logResponse)JSONEx(obj interface{}, c int) error {
+    var err=this.o.JSONEx(obj, c)
+    if err==nil || err==SENT_BUT_ABORT {
+        this.OnHeadSent(this.o, c)
+    }
+    return err
+}
