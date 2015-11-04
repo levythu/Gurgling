@@ -25,8 +25,9 @@ func SetPreCGurgling(obj *Gurgling_Config) {
         CGurgling.F[k]=v
     }
 }
+// express calling
 func SetGEnv(theme string) {
-    if v, ok:=_CGurgling_Predefined_map[theme];ok {
+    if v, ok:=_CGurgling_Predefined_map[theme]; ok {
         SetPreCGurgling(v)
     }
 }

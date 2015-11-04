@@ -53,6 +53,8 @@ func (this *RegexpMatcher)AddRule(rulePattern string, methodPattern string, stor
     rulePattern="^"+rulePattern // Match prefix
     if isStrict {
         rulePattern+="$"    // Match whole word
+    } else {
+        rulePattern+="(?:/|$)"
     }
     if rulePattern=="^$" {
         rulePattern="^/?$"  // exact "" should also match "/"
@@ -84,6 +86,7 @@ func (this *RegexpMatcher)Match(path *string, baseUrl *string, reqF map[string]T
         var res=this.rules[startpoint].rulePattern.FindStringSubmatch(*path)
         if len(res)>0 && (this.rules[startpoint].methodPattern=="" ||  this.rules[startpoint].methodPattern==method) {
             // Matched!
+            res[0]=strings.TrimSuffix(res[0], "/")
             *path=strings.TrimPrefix(*path, res[0])
             *baseUrl=*baseUrl+res[0]
             reqF[REGEXP_RESULT]=res

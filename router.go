@@ -20,6 +20,7 @@ type Router interface {
     ServeHTTP(http.ResponseWriter, *http.Request)
     Handler(Request, Response) (bool, Request, Response)
     Launch(string) error
+    F() map[string]Tout
 }
 
 // The followings are mountable: =====================================================
@@ -58,6 +59,8 @@ type router struct {
     catcher RouterErrorCatcher
     // if nil, return a default info.
     h404 Terminal
+
+    f map[string]Tout
 }
 
 // The error will be fatal.
@@ -72,6 +75,7 @@ func GetRouter(MountPoint string, matchHandler matcher.Matcher) Router {
         tailList: []Cattail{},
         catcher: CGurgling.H500,
         h404: CGurgling.H404,
+        f: map[string]Tout{},
     }
 }
 
@@ -85,6 +89,7 @@ func ARouter() Router {
         tailList: []Cattail{},
         catcher: CGurgling.H500,
         h404: CGurgling.H404,
+        f: map[string]Tout{},
     }
 }
 
@@ -96,6 +101,7 @@ func ARegexpRouter() Router {
         tailList: []Cattail{},
         catcher: CGurgling.H500,
         h404: CGurgling.H404,
+        f: map[string]Tout{},
     }
 }
 
@@ -276,4 +282,7 @@ func (this *router)Set404Handler(proc Terminal) Router {
 }
 func (this *router)Launch(addr string) error {
     return http.ListenAndServe(addr, this)
+}
+func (this *router)F() map[string]Tout {
+    return this.f
 }

@@ -61,7 +61,7 @@ func (this *BruteforceMatcher)Match(path *string, baseUrl *string, reqF map[stri
     var length=len(this.rules)
     for startpoint<length {
         if (  ( this.rules[startpoint].isStrict && (*path==this.rules[startpoint].rulePattern || *path=="/" && this.rules[startpoint].rulePattern=="") ) ||
-            ( !this.rules[startpoint].isStrict && strings.HasPrefix(*path, this.rules[startpoint].rulePattern) )  ) &&
+            ( !this.rules[startpoint].isStrict && (*path==this.rules[startpoint].rulePattern || strings.HasPrefix(*path, this.rules[startpoint].rulePattern+"/")) )  ) &&
             (this.rules[startpoint].methodPattern=="" ||  this.rules[startpoint].methodPattern==method) {
             // Matched!
             *path=strings.TrimPrefix(*path, this.rules[startpoint].rulePattern)
