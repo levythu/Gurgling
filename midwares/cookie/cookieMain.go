@@ -15,22 +15,21 @@ func ACookie() *Cookier {
 }
 
 func (this *Cookier)Handler(req Request, res Response) (bool, Request, Response) {
-    req["Cookie"]=CookieHandler(&CookieHandler {
+    req.F()["Cookie"]=&CookieHandler {
         req: req,
         res: res,
-    })
+    }
     return true, req, res
 }
 
-type CookieHandler *cookieHandler
-type cookieHandler struct {
+type CookieHandler struct {
     req Request
     res Response
 }
 
 // Get the cookie specified by name.
 // If such cookie does not exist, an empty string will be returned.
-func (CookieHandler this)Get(name string) string {
+func (this *CookieHandler)Get(name string) string {
     var target, err=this.req.R().Cookie(name)
     if err!=nil {
         return ""
@@ -38,7 +37,7 @@ func (CookieHandler this)Get(name string) string {
     return target.Value
 }
 
-func (CookieHandler this)GetCookie(name string) *http.Cookie {
+func (this *CookieHandler)GetCookie(name string) *http.Cookie {
     var target, err=this.req.R().Cookie(name)
     if err!=nil {
         return nil
@@ -47,35 +46,35 @@ func (CookieHandler this)GetCookie(name string) *http.Cookie {
 }
 
 // Set a session cookie
-func (CookieHandler this)Set(name string, val string) {
-    SetCookie(&http.Cookie{
+func (this *CookieHandler)Set(name string, val string) {
+    this.SetCookie(&http.Cookie{
         Name: name,
         Value: val,
     })
 }
 
-func (CookieHandler)SetWithAge(name string, val string, age int) {
-    SetCookie(&http.Cookie{
+func (this *CookieHandler)SetWithAge(name string, val string, age int) {
+    this.SetCookie(&http.Cookie{
         Name: name,
         Value: val,
         MaxAge: age,
     })
 }
-func (CookieHandler)SetWithExpire(name string, val string, expireAt time.Time) {
-    SetCookie(&http.Cookie{
+func (this *CookieHandler)SetWithExpire(name string, val string, expireAt time.Time) {
+    this.SetCookie(&http.Cookie{
         Name: name,
         Value: val,
         Expires: expireAt,
     })
 }
-func (CookieHandler)Remove(name string) {
-    SetCookie(&http.Cookie{
+func (this *CookieHandler)Remove(name string) {
+    this.SetCookie(&http.Cookie{
         Name: name,
         Value: "",
         MaxAge: -1,
     })
 }
 
-func (CookieHandler)SetCookie(val *http.Cookie) {
-    http.SetCookie(this.req.R(), val)
+func (this *CookieHandler)SetCookie(val *http.Cookie) {
+    http.SetCookie(this.res.R(), val)
 }
