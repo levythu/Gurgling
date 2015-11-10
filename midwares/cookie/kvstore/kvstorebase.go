@@ -7,4 +7,6 @@ type KvStore interface {
 
     // Nonexist returns nil
     Get(key string) map[string]string
+
+    Remove(key string) error
 }

@@ -224,12 +224,18 @@ func (this *router)UseSpecified(mountpoint string, method string/*=""*/, process
     return this
 }
 
+const (
+    RKEY_LOW_LAYER_R="__low_layer_r"
+)
+
 func (this *router)ServeHTTP(w http.ResponseWriter, r *http.Request) {
     if this.initMountPoint==not_init_mounter {
         panic(INVALID_MOUNT_POINT)
     }
     var req=NewRequest(r, this.initMountPoint)
     var res=NewResponse(w)
+    req.R()[RKEY_LOW_LAYER_R]=res.R()
+    res.R()[RKEY_LOW_LAYER_R]=req.R()
     this.Handler(req, res)
 }
 

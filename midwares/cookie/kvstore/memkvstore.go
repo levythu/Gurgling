@@ -28,3 +28,11 @@ func (this *MemKvStore)Get(key string) map[string]string {
     }
     return nil
 }
+
+func (this *MemKvStore)Remove(key string) error {
+    this.lock.Lock()
+    defer this.lock.Unlock()
+
+    delete(this.Map, key)
+    return nil
+}

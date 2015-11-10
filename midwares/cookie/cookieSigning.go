@@ -22,6 +22,14 @@ func setSignedCookie(w http.ResponseWriter, cookie *http.Cookie, secret string) 
     http.SetCookie(w, &signCookie)
 }
 
+func removeSignedCookie(w http.ResponseWriter, cookie *http.Cookie) {
+    cookie.MaxAge=-1
+    var signCookie=*cookie
+    signCookie.Name+=sign_suffix
+    http.SetCookie(w, cookie)
+    http.SetCookie(w, &signCookie)
+}
+
 // If not valid, returns nil
 func getSignedCookie(r *http.Request, name string, secret string) *http.Cookie {
     var target, err=r.Cookie(name)
