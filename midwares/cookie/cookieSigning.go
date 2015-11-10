@@ -9,6 +9,7 @@ import (
 )
 
 const sign_suffix="-gsign"
+const mid_salt="~github.com/levythu/gurgling/midwares/cookie::cookieSigning~"
 
 func _hash(src string) string {
     return fmt.Sprintf("%x", sha256.Sum256([]byte(src)))
@@ -17,7 +18,7 @@ func _hash(src string) string {
 func setSignedCookie(w http.ResponseWriter, cookie *http.Cookie, secret string) {
     var signCookie=*cookie
     signCookie.Name+=sign_suffix
-    signCookie.Value=_hash(secret+signCookie.Value)
+    signCookie.Value=_hash(secret+mid_salt+signCookie.Value)
     http.SetCookie(w, cookie)
     http.SetCookie(w, &signCookie)
 }
@@ -41,7 +42,7 @@ func getSignedCookie(r *http.Request, name string, secret string) *http.Cookie {
         return nil
     }
 
-    if _hash(secret+target.Value)!=targetSigned.Value {
+    if _hash(secret+mid_salt+target.Value)!=targetSigned.Value {
         return nil
     }
     return target

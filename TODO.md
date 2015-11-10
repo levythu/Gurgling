@@ -14,8 +14,8 @@
 [x] support for regexp
 [x] use nil as default catcher
 [x] Add body parser
-[ ] Add cookie handler
+[x] Add cookie handler
 [ ] Modify AXX constructor to a more friendly parameter-passing form
 [x] BUG: prefix match
-[ ] Add session handler
-[ ] Use longer uuid generator
+[x] Add session handler
+[x] Use longer uuid generator
