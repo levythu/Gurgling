@@ -23,7 +23,9 @@ type Session struct {
 
 func ASession(secret string) *Session {
     var ret=&Session{
-        StoreIO: kvstore.MemKvStore(make(map[string]map[string]string)),
+        StoreIO: &kvstore.MemKvStore{
+            Map: make(map[string]map[string]string),
+        },
         Secret: secret,
         Resave: false,
         Rolling: false,
@@ -42,5 +44,9 @@ func ASession(secret string) *Session {
 func (this *Session)Handler(req Request, res Response) (bool, Request, Response) {
     var hackedRes=&resSession{}
     hackedRes.Response=res
+    hackedRes.sessionInfo=this
+
+
+
     return true, req, hackedRes
 }

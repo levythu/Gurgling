@@ -8,6 +8,7 @@ import (
 type resSession struct {
     // implementing Response
     Response
+    sessionInfo *Session
 }
 
 func (this *resSession)Send(cont string) error {
