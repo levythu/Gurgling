@@ -8,7 +8,7 @@ import (
 
 type Session struct {
     StoreIO kvstore.KvStore
-    Salt string
+    Secret string
     UUIDGenerator func() string
     Resave bool
     Rolling bool
@@ -21,10 +21,10 @@ type Session struct {
     uidgen *uuid.UUID
 }
 
-func ASession(salt string) *Session {
+func ASession(secret string) *Session {
     var ret=&Session{
-        StoreIO: kvstore.MemKvStore(make(map[string]string)),
-        Salt: salt,
+        StoreIO: kvstore.MemKvStore(make(map[string]map[string]string)),
+        Secret: secret,
         Resave: false,
         Rolling: false,
         Path: "/",

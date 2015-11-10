@@ -1,8 +1,8 @@
 package kvstore
 
 type KvStore interface {
-    Set(key string, val string) error
+    Set(key string, val map[string]string) error
 
-    // Nonexist returns empty
-    Get(key string) string
+    // Nonexist returns nil
+    Get(key string) map[string]string
 }
