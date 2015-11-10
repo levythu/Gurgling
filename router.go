@@ -234,8 +234,8 @@ func (this *router)ServeHTTP(w http.ResponseWriter, r *http.Request) {
     }
     var req=NewRequest(r, this.initMountPoint)
     var res=NewResponse(w)
-    req.R()[RKEY_LOW_LAYER_R]=res.R()
-    res.R()[RKEY_LOW_LAYER_R]=req.R()
+    req.F()[RKEY_LOW_LAYER_R]=res.F()
+    res.F()[RKEY_LOW_LAYER_R]=req.F()
     this.Handler(req, res)
 }
 

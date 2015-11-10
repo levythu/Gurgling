@@ -127,10 +127,10 @@ func (this *Session)writeSession(res Response, sid string) {
         toSet.MaxAge=this.MaxAge
     }
     if sid=="" {
-        removeSignedCookie(res.R(), &sid)
+        removeSignedCookie(res.R(), &toSet)
         return
     }
-    setSignedCookie(res.R(), &sid)
+    setSignedCookie(res.R(), &toSet, this.Secret)
 }
 
 func compareMap(map1, map2 map[string]string) bool {
