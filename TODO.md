@@ -17,3 +17,5 @@
 [ ] Add cookie handler
 [ ] Modify AXX constructor to a more friendly parameter-passing form
 [x] BUG: prefix match
+[ ] Add session handler
+[ ] Use longer uuid generator
