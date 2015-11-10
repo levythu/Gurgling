@@ -40,7 +40,6 @@ func ASession(salt string) *Session {
 }
 
 func (this *Session)Handler(req Request, res Response) (bool, Request, Response) {
-    
     var hackedRes=&resSession{}
     hackedRes.Response=res
     return true, req, hackedRes
