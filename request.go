@@ -44,6 +44,9 @@ type Request interface {
 
     // extra use for midwares. Most of time the value is a function.
     F() map[string]Tout
+
+    // nonexist returns ""
+    Referer() string
 }
 
 // Return a OriRequest, which acts every default behavior
@@ -112,4 +115,7 @@ func (this *OriRequest)R() *http.Request {
 }
 func (this *OriRequest)F() map[string]Tout {
     return this.f
+}
+func (this *OriRequest)Referer() string {
+    return this.r.Referer()
 }
