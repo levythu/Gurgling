@@ -336,3 +336,18 @@ Returns the wrapped original `*Request` for advanced use. Please note that modif
 
 #### `func (Request)F() map[string]Tout`
 `Tout` is `interface{}`. It is preserved for any use by midwares, e.g., storing extracted data or adding functions.
+
+## Attachment #1: Components List
+### Midwares
+Midwares only modify the request & response to assist implementing some functions. Typically, subsequent handler is needed to mount on the router which a midware is mounted on.
+
+- `github.com/levythu/gurgling/midwares/analyzer`: A set of analyzer for logging and timing each request.
+- `github.com/levythu/gurgling/midwares/bodyparser`: A midware trying to parse the body of any kind to JSON, Forms or simply Bytes buffer, typically mounted to a POST API.
+- `github.com/levythu/gurgling/midwares/cookie`: A midware to parse cookies from the request and provide setting API. It also provides signed cookie and session components.
+- `github.com/levythu/gurgling/midwares/staticfs`: A midware to look up the path of each GET request from one specified directory and return the file if existing. Otherwise, pass the request to the next handler. Cache control is implemented.
+- `github.com/levythu/gurgling/midwares/urlnormalizer`: Normalizing the url, e.g., sanitizing it to remove redundant slashes and dots.
+
+### Routers
+Routers are terminals, all the other components (except `LAST`) mounted on the router will never get triggered.
+
+- `github.com/levythu/gurgling/routers/simplefsserver`: A simple static file server, which mainly relies on `staticfs` midware. Additionally, it provides 404 page and auto indexing option.
