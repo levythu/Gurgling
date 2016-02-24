@@ -6,7 +6,7 @@ import (
     . "github.com/levythu/gurgling"
     . "github.com/levythu/gurgling/definition"
     "net/http"
-    "fmt"
+    // "fmt"
 )
 
 type Session struct {
@@ -88,16 +88,16 @@ func (this *Session)UpdateSession(res Response) {
         // not setup a session yet
         if !ok2 || len(session)==0 {
             // not modified, do nothing then.
-            fmt.Println("Not modified.")
+            // fmt.Println("Not modified.")
             return
         } else {
             // a new session should be establish
             var newSID=this.UUIDGenerator()
             if this.StoreIO.Set(newSID, session)!=nil {
-                fmt.Println("Fail to create new session.")
+                // fmt.Println("Fail to create new session.")
                 return
             }
-            fmt.Println("New session:", newSID, "created.")
+            // fmt.Println("New session:", newSID, "created.")
             this.writeSession(res, newSID)
             return
         }
@@ -105,7 +105,7 @@ func (this *Session)UpdateSession(res Response) {
         // already a session, check whether to update
         if !ok2 || len(session)==0 {
             // remove the session
-            fmt.Println("Old session:", sessionid, "removed.")
+            // fmt.Println("Old session:", sessionid, "removed.")
             this.StoreIO.Remove(sessionid)
             this.writeSession(res, "")
             return
@@ -114,7 +114,7 @@ func (this *Session)UpdateSession(res Response) {
             this.writeSession(res, sessionid)
         }
         if this.Resave || !compareMap(session, session_old) {
-            fmt.Println("Old session:", sessionid, "updated.")
+            // fmt.Println("Old session:", sessionid, "updated.")
             this.StoreIO.Set(sessionid, session)
         }
     }
