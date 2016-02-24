@@ -3,7 +3,7 @@
 [x] Modify the way router handles 404
 [x] Add url normaliser
 [x] Refine interface
-[ ] Test it!
+[x] Test it!
 [x] Add sandwich
 [x] Add logger
 [x] exp on infinite loop - loop forever
@@ -15,7 +15,7 @@
 [x] use nil as default catcher
 [x] Add body parser
 [x] Add cookie handler
-[ ] Modify AXX constructor to a more friendly parameter-passing form
+[ ] <Deferred> Modify AXX constructor to a more friendly parameter-passing form
 [x] BUG: prefix match
 [x] Add session handler
 [x] Use longer uuid generator
