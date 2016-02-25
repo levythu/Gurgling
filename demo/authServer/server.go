@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+    SetGEnv("release")
     var root=ARouter()
     //root.Use(auth.ABasicAuth("levy", "levythu", "This site only"))
     root.Use(auth.ABasicAuth(func(u string, p string) bool {

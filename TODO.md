@@ -22,4 +22,4 @@
 [ ] Launch new version to support HTTPS
 [ ] CORS fast set
 [x] Piper
-[ ] Authentication components
+[x] Authentication components (Basic auth)
