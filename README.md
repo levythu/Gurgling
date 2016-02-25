@@ -1,4 +1,4 @@
-# Gurgling 0.4.0
+# Gurgling 0.4.1
 An extremely-light framework for Golang to build restful API and Website.
 
 **0.4.0 NEWS! Cookie and Session midware implemented!**

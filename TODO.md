@@ -21,3 +21,4 @@
 [x] Use longer uuid generator
 [ ] Launch new version to support HTTPS
 [ ] CORS fast set
+[x] Piper
