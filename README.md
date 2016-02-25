@@ -1,7 +1,7 @@
-# Gurgling 0.4.2
+# Gurgling 0.5.1
 An extremely-light framework for Golang to build restful API and Website.
 
-**0.4.2 NEWS! Basic Authorization implemented.**
+**0.5.0 NEWS! HTTPS supported.**
 
 **Special Thanks to [Express](http://expressjs.com/), which provides API samples for this project.**
 
@@ -97,6 +97,27 @@ func main() {
 }
 ```
 
+### A HTTPS server is simple as well
+```go
+package main
+
+import (
+    . "github.com/levythu/gurgling"
+)
+
+func main() {
+
+    var router=ARouter()
+    router.Get(func(res Response) {
+        res.Send("Hello, World!")
+    })
+
+    // Launch the server, using prepared certificate and private key
+    fmt.Println("Running...")
+    router.Launch(":8192", "public/server.crt", "public/server.key")
+}
+```
+
 ## API Docs
 ### Router
 The core module of gurgling. It is indeed an interface, and is implemented by `router`, its default and original version. The interface is designed for extensions.
@@ -112,7 +133,14 @@ Creates and returns one default router with `mountpoint="/"`, which is the defau
 Creates and returns one default router with `mountpoint="/"`. It differs from `ARouter` in that its returned router supports regexp rule. Of course, this leads to longer time to match. Thus, for non-regexp use, create router with `ARouter()` instead.
 
 #### `func (Router)Launch(addr string) error`
-Invokes `net/http` to launch the server at `addr`. This function is supposed to keep running unless an error is encountered.
+Invokes `net/http` to launch the HTTP server at `addr`. This function is supposed to keep running unless an error is encountered.
+
+#### `func (Router)Launch(addr string, certFile, keyFile string) error`
+Invokes `net/http` to launch the HTTPS server at `addr`. `certFile` and `keyFile` are the filepaths of certificate and private key file required.
+
+#### `func (Router)Launch([certFile, keyFile string, [setAHTTPRedirector bool]]) error`
+If all the parameters are omitted, a HTTP server is launched at port 80.
+If `certFile` and `keyFile` are given, a HTTPS server is launched at port 443. When `setAHTTPRedirector` is given and set to `true`, a HTTP server is also launched at port 80 automatically to redirect all http traffic to https.
 
 #### `func (Router)Use([mountpoint string], processor Tout) Router`
 Mounts a mountable to the router at mountpoint. Mountpoint must start with `/`. Create a router with matcher `RegexpMatcher` could make regexp supported, but **DO NOT** use first-char or last-char matcher (`^` or `$`). It will try to match the mountpoint by prefix.   

@@ -19,8 +19,8 @@
 [x] BUG: prefix match
 [x] Add session handler
 [x] Use longer uuid generator
-[ ] Launch new version to support HTTPS
+[x] Launch new version to support HTTPS
 [ ] CORS fast set
 [x] Piper
 [x] Authentication components (Basic auth)
-[ ] Add single-parameter func handler
+[x] Add single-parameter func handler
