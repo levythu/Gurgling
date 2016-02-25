@@ -40,7 +40,7 @@ func PipeX(req Request, res Response, targetURL string, client *http.Client) err
         return err
     }
 
-    proxyRequest.Header=deepCopyHeader(req.Header)
+    proxyRequest.Header=deepCopyHeader(oReq.Header)
     var proxyResponse, err2=client.Do(proxyRequest)
     if err2!=nil {
         return err2
