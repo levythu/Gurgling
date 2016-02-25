@@ -287,7 +287,10 @@ func (this *router)Set404Handler(proc Terminal) Router {
     return this
 }
 
+// Launch(): Launch http at ":80"
 // Launch("[host]:port"): launch http server
+// Launch(certFile, keyFile): launch https server at ":443"
+// Launch(certFile, keyFile, bool): launch https server at ":443" and if boolean is true, set redirect http server on :80
 // Launch("[host]:port", certFile, keyFile): launch https server
 func (this *router)Launch(paraList ...interface{}) error {
     if len(paraList)==1 {
@@ -299,9 +302,36 @@ func (this *router)Launch(paraList ...interface{}) error {
     } else if len(paraList)==3 {
         var e1, o1=paraList[0].(string)
         var e2, o2=paraList[1].(string)
-        var e3, o3=paraList[2].(string)
-        if o1 && o2 && o3 {
+        if !o1 || !o2 {
+            panic(INVALID_PARAMETER)
+        }
+
+        switch e3:=paraList[2].(type) {
+        case bool:
+            if e3 {
+                // establish a http redirector
+                go (func() {
+                    var tRouter=ARouter().Use(func(req Request, res Response) {
+                        var tURL=*req.R().URL
+                        tURL.Scheme="https"
+                        res.Redirect(tURL.String())
+                    })
+                    tRouter.Launch()
+                })()
+            }
+            return http.ListenAndServeTLS(":443", e1, e2, this)
+        case string:
             return http.ListenAndServeTLS(e1, e2, e3, this)
+        default:
+            panic(INVALID_PARAMETER)
+        }
+    } else if len(paraList)==0 {
+        return http.ListenAndServe(":80", this)
+    } else if len(paraList)==2 {
+        var e1, o1=paraList[0].(string)
+        var e2, o2=paraList[1].(string)
+        if o1 && o2 {
+            return http.ListenAndServeTLS(":443", e1, e2, this)
         } else {
             panic(INVALID_PARAMETER)
         }

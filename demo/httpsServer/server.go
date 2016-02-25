@@ -12,6 +12,6 @@ func main() {
         res.Send("Hello World!")
     })
 
-    fmt.Println("Running on port 8023...")
-    router.Launch(":8023", "public/server.crt", "public/server.key")
+    fmt.Println("Running")
+    router.Launch("public/server.crt", "public/server.key", true)
 }
