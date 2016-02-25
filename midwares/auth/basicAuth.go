@@ -21,9 +21,9 @@ func (this *BasicAuthMidware)Handler(req Request, res Response) (bool, Request, 
     return false, req, res
 }
 
-func generateInspector(preUser, prePass) func(string, string) bool {
+func generateInspector(preUser string, prePass string) func(string, string) bool {
     return func(usr string, pass string) bool {
-        return usr==preUser && pass=prePass
+        return usr==preUser && pass==prePass
     }
 }
 
@@ -53,10 +53,10 @@ func ABasicAuth(paraList ...interface{}) *BasicAuthMidware {
         default:
             panic(INVALID_PARAMETER)
         }
-    } else if len(paraList==3) {
+    } else if len(paraList)==3 {
         var e1, o1=paraList[0].(string)
-        var e2, o2=paraList[0].(string)
-        var e3, o3=paraList[0].(string)
+        var e2, o2=paraList[1].(string)
+        var e3, o3=paraList[2].(string)
         if o1 && o2 && o3 {
             ret.inspector=generateInspector(e1, e2)
             ret.realm=e3
