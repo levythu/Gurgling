@@ -1,0 +1,55 @@
+package utils
+
+import (
+    . "github.com/levythu/gurgling"
+    "net/http"
+    "io"
+)
+
+var pipeClient=&http.Client{}
+func Pipe(req Request, res Response, targetURL string) error {
+    return PipeX(req, res, targetURL, pipeClient)
+}
+
+func deepCopyHeader(src http.Header) http.Header {
+    var srch=map[string][]string(src)
+    var target=map[string][]string{}
+    for k, v:=range srch {
+        var tmp=make([]string, len(v))
+        copy(tmp, v)
+        target[k]=tmp
+    }
+
+    return target
+}
+func deepCopyHeaderIn(src http.Header, des http.Header) {
+    var srch=map[string][]string(src)
+    var target=map[string][]string(des)
+    for k, v:=range srch {
+        var tmp=make([]string, len(v))
+        copy(tmp, v)
+        target[k]=tmp
+    }
+}
+
+func PipeX(req Request, res Response, targetURL string, client *http.Client) error {
+    var oReq=req.R();
+    var oRes=res.R();
+    var proxyRequest, err=http.NewRequest(oReq.Method, targetURL, oReq.Body)
+    if err!=nil {
+        return err
+    }
+
+    proxyRequest.Header=deepCopyHeader(req.Header)
+    var proxyResponse, err2=client.Do(proxyRequest)
+    if err2!=nil {
+        return err2
+    }
+
+    deepCopyHeaderIn(proxyResponse.Header, oRes.Header())
+    oRes.WriteHeader(proxyResponse.StatusCode)
+    io.Copy(oRes, proxyResponse.Body)
+    proxyResponse.Body.Close()
+
+    return nil
+}
