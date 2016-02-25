@@ -19,7 +19,7 @@ type Router interface {
     UseSpecified(string, string/*=""*/, Tout, bool) Router
     ServeHTTP(http.ResponseWriter, *http.Request)
     Handler(Request, Response) (bool, Request, Response)
-    Launch(string) error
+    Launch(paraList ...interface{}) error
     F() map[string]Tout
 }
 
@@ -286,8 +286,28 @@ func (this *router)Set404Handler(proc Terminal) Router {
     this.h404=proc
     return this
 }
-func (this *router)Launch(addr string) error {
-    return http.ListenAndServe(addr, this)
+
+// Launch("[host]:port"): launch http server
+// Launch("[host]:port", certFile, keyFile): launch https server
+func (this *router)Launch(paraList ...interface{}) error {
+    if len(paraList)==1 {
+        var addr, ok=paraList[0].(string)
+        if !ok {
+            panic(INVALID_PARAMETER)
+        }
+        return http.ListenAndServe(addr, this)
+    } else if len(paraList)==3 {
+        var e1, o1=paraList[0].(string)
+        var e2, o2=paraList[1].(string)
+        var e3, o3=paraList[2].(string)
+        if o1 && o2 && o3 {
+            return http.ListenAndServeTLS(e1, e2, e3, this)
+        } else {
+            panic(INVALID_PARAMETER)
+        }
+    } else {
+        panic(INVALID_PARAMETER)
+    }
 }
 func (this *router)F() map[string]Tout {
     return this.f
