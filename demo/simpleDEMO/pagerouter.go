@@ -7,7 +7,7 @@ import (
 
 func getPageRouter() Router {
     var page=ARouter()
-    page.Get("/", func(req Request, res Response) {
+    page.Get("/", func(res Response) {
         res.Send("The list of pages.")
     })
     page.Get("/edit", func(req Request, res Response) {

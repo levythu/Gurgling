@@ -182,6 +182,12 @@ func (this *router)UseSpecified(mountpoint string, method string/*=""*/, process
             processor(req, res)
             return false, nil, nil
         }), isStrict)
+    case func(Response):
+        // Always use Midware as storage.
+        this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
+            processor(res)
+            return false, nil, nil
+        }), isStrict)
     case Terminal:
         // Always use Midware as storage.
         this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {

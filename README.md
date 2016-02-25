@@ -26,7 +26,7 @@ func main() {
     var router=ARouter()
 
     // Mount one handler
-    router.Get(func(req Request, res Response) {
+    router.Get(func(res Response) {
         res.Send("Hello, World!")
     })
 
@@ -46,7 +46,7 @@ import (
 )
 
 func main() {
-    ARouter( ).Get(func(req Request, res Response) {
+    ARouter( ).Get(func(res Response) {
                 res.Send("Hello, World!")
             }).Launch(":8080")
 }
@@ -156,6 +156,16 @@ router.Use("/", func(req Request, res Response) bool {
 ##### **`Terminal`** (`type Terminal func(Request, Response)`)
 A function, receiving `Request` and `Response` as parameter.  
 It is a simplified form of Midware and will never pass request. So it does not have return value and quite easy to code.
+
+```go
+router.Use("/", func(req Request, res Response) {
+    res.Send("Hello, World!")
+})
+```
+
+##### **`Dump`** (`type Terminal func(Response)`)
+A function, receiving only `Response` as parameter, which means the codes in the function do not need request anymore.
+It is a simplified form of Terminal.
 
 ```go
 router.Use("/", func(req Request, res Response) {
