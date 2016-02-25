@@ -19,7 +19,7 @@ type Router interface {
     UseSpecified(string, string/*=""*/, Tout, bool) Router
     ServeHTTP(http.ResponseWriter, *http.Request)
     Handler(Request, Response) (bool, Request, Response)
-    Launch(string) error
+    Launch(paraList ...interface{}) error
     F() map[string]Tout
 }
 
@@ -182,6 +182,12 @@ func (this *router)UseSpecified(mountpoint string, method string/*=""*/, process
             processor(req, res)
             return false, nil, nil
         }), isStrict)
+    case func(Response):
+        // Always use Midware as storage.
+        this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
+            processor(res)
+            return false, nil, nil
+        }), isStrict)
     case Terminal:
         // Always use Midware as storage.
         this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
@@ -286,8 +292,58 @@ func (this *router)Set404Handler(proc Terminal) Router {
     this.h404=proc
     return this
 }
-func (this *router)Launch(addr string) error {
-    return http.ListenAndServe(addr, this)
+
+// Launch(): Launch http at ":80"
+// Launch("[host]:port"): launch http server
+// Launch(certFile, keyFile): launch https server at ":443"
+// Launch(certFile, keyFile, bool): launch https server at ":443" and if boolean is true, set redirect http server on :80
+// Launch("[host]:port", certFile, keyFile): launch https server
+func (this *router)Launch(paraList ...interface{}) error {
+    if len(paraList)==1 {
+        var addr, ok=paraList[0].(string)
+        if !ok {
+            panic(INVALID_PARAMETER)
+        }
+        return http.ListenAndServe(addr, this)
+    } else if len(paraList)==3 {
+        var e1, o1=paraList[0].(string)
+        var e2, o2=paraList[1].(string)
+        if !o1 || !o2 {
+            panic(INVALID_PARAMETER)
+        }
+
+        switch e3:=paraList[2].(type) {
+        case bool:
+            if e3 {
+                // establish a http redirector
+                go (func() {
+                    var tRouter=ARouter().Use(func(req Request, res Response) {
+                        var tURL=*req.R().URL
+                        tURL.Scheme="https"
+                        res.Redirect(tURL.String())
+                    })
+                    tRouter.Launch()
+                })()
+            }
+            return http.ListenAndServeTLS(":443", e1, e2, this)
+        case string:
+            return http.ListenAndServeTLS(e1, e2, e3, this)
+        default:
+            panic(INVALID_PARAMETER)
+        }
+    } else if len(paraList)==0 {
+        return http.ListenAndServe(":80", this)
+    } else if len(paraList)==2 {
+        var e1, o1=paraList[0].(string)
+        var e2, o2=paraList[1].(string)
+        if o1 && o2 {
+            return http.ListenAndServeTLS(":443", e1, e2, this)
+        } else {
+            panic(INVALID_PARAMETER)
+        }
+    } else {
+        panic(INVALID_PARAMETER)
+    }
 }
 func (this *router)F() map[string]Tout {
     return this.f

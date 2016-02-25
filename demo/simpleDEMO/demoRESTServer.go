@@ -13,7 +13,7 @@ func main() {
 
     router.Use(analyzer.ASimpleAnalyzer())
     router.Use(staticfs.AStaticfs("public/"))
-    router.Get(func(req Request, res Response) {
+    router.Get(func(res Response) {
         res.Send("This is index.")
     }).Use("/page", page)
 
