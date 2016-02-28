@@ -24,3 +24,4 @@
 [x] Piper
 [x] Authentication components (Basic auth)
 [x] Add single-parameter func handler
+[ ] Reconstruct response struct
