@@ -25,4 +25,4 @@
 [x] Authentication components (Basic auth)
 [x] Add single-parameter func handler
 [ ] Reconstruct response struct
-[ ] Add X-POWERED-BY header setting
+[x] Add X-POWERED-BY header setting

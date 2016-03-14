@@ -250,6 +250,7 @@ func (this *router)ServeHTTP(w http.ResponseWriter, r *http.Request) {
     var res=NewResponse(w)
     req.F()[RKEY_LOW_LAYER_R]=res.F()
     res.F()[RKEY_LOW_LAYER_R]=req.F()
+    res.Set("X-Powered-By", "Gurgling "+Version)
     this.Handler(req, res)
 }
 
