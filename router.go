@@ -42,6 +42,8 @@ type Terminal func(Request, Response)
 // a midware fixing on the rear.
 type Cattail func(Request, Response)
 
+type Dump func(Response)
+
 // one sandwich means mounting a midware and a cattail
 type Sandwich interface {
     IMidware
@@ -188,6 +190,12 @@ func (this *router)UseSpecified(mountpoint string, method string/*=""*/, process
             processor(res)
             return false, nil, nil
         }), isStrict)
+    case Dump:
+        // Always use Midware as storage.
+        this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
+            processor(res)
+            return false, nil, nil
+        }), isStrict)
     case Terminal:
         // Always use Midware as storage.
         this.mat.AddRule(mountpoint, method, Midware(func(req Request, res Response) (bool, Request, Response) {
@@ -242,6 +250,7 @@ func (this *router)ServeHTTP(w http.ResponseWriter, r *http.Request) {
     var res=NewResponse(w)
     req.F()[RKEY_LOW_LAYER_R]=res.F()
     res.F()[RKEY_LOW_LAYER_R]=req.F()
+    res.Set("X-Powered-By", "Gurgling "+Version)
     this.Handler(req, res)
 }
 
