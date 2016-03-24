@@ -3,11 +3,19 @@ package utils
 import (
     . "github.com/levythu/gurgling"
     "net/http"
+    "crypto/tls"
+    "strings"
     "io"
 )
 
 var pipeClient=&http.Client{}
+var piptClientSSL=&http.Client{Transport: &http.Transport{
+	TLSClientConfig: &tls.Config{},
+}}
 func Pipe(req Request, res Response, targetURL string) error {
+    if strings.HasPrefix(strings.ToLower(targetURL), "https://") {
+        return PipeX(req, res, targetURL, piptClientSSL)
+    }
     return PipeX(req, res, targetURL, pipeClient)
 }
 

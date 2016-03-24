@@ -26,3 +26,4 @@
 [x] Add single-parameter func handler
 [ ] Reconstruct response struct
 [x] Add X-POWERED-BY header setting
+[x] Add HTTPS support for Pipe
