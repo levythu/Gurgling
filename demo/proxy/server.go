@@ -6,7 +6,7 @@ import (
     "fmt"
 )
 
-const targetHostname="http://www.levy.at"
+const targetHostname="https://www.levy.at"
 
 func main() {
 
