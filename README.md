@@ -114,7 +114,7 @@ func main() {
 
     // Launch the server, using prepared certificate and private key
     fmt.Println("Running...")
-    router.Launch(":8192", "public/server.crt", "public/server.key")
+    router.Launch(":8192", "public/server.crt", "private/server.key")
 }
 ```
 
