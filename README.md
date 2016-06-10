@@ -1,7 +1,7 @@
 # Gurgling 0.5.1
 An extremely-light framework for Golang to build restful API and Website.
 
-**0.5.0 NEWS! HTTPS supported.**
+**0.6.0 NEWS! Websocket is AVAILABLE!**
 
 **Special Thanks to [Express](http://expressjs.com/), which provides API samples for this project.**
 
@@ -389,3 +389,4 @@ Midwares only modify the request & response to assist implementing some function
 Routers are terminals, all the other components (except `LAST`) mounted on the router will never get triggered.
 
 - `github.com/levythu/gurgling/routers/simplefsserver`: A simple static file server, which mainly relies on `staticfs` midware. Additionally, it provides 404 page and auto indexing option.
+- `github.com/levythu/gurgling/routers/websocket`: Router implementing websocket protocol and providing simple interface for full-duplex commnunication between server and client.
