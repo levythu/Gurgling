@@ -1,4 +1,4 @@
-# Gurgling 0.5.1
+# Gurgling 0.6.0
 An extremely-light framework for Golang to build restful API and Website.
 
 **0.6.0 NEWS! Websocket is AVAILABLE!**
